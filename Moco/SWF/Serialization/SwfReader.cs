@@ -3,6 +3,7 @@ using System.Reflection.PortableExecutable;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags;
+using Moco.SWF.Tags.Control;
 
 namespace Moco.SWF.Serialization;
 
@@ -94,6 +95,20 @@ public class SwfReader : IDisposable
     }
 
     /// <summary>
+    /// Reads an RGB record.
+    /// </summary>
+    /// <returns>The RGB record.</returns>
+    internal Rgb ReadRGBRecord()
+    {
+        return new Rgb
+        {
+            Red = _reader.ReadByte(),
+            Green = _reader.ReadByte(),
+            Blue = _reader.ReadByte(),
+        };
+    }
+
+    /// <summary>
     /// Reads the record header for a tag.
     /// </summary>
     /// <returns>The record header.</returns>
@@ -154,10 +169,17 @@ public class SwfReader : IDisposable
         var record = ReadRecordHeader();
         Console.WriteLine($"Read tag {record.Type} of length {record.Length}");
 
-        // TODO(pref): Actually read the tag.
-        _reader.ReadBytes(record.Length);
+        var tag = record.Type switch
+        {
+            TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this),
+            _ => null!
+        };
 
-        return new Tag();
+        // If we haven't implemented this tag, skip the length.
+        if (tag is null)
+            _reader.ReadBytes(record.Length);
+
+        return tag!;
     }
 
     /// <inheritdoc/>
@@ -165,5 +187,7 @@ public class SwfReader : IDisposable
     {
         _reader?.Dispose();
         _readerStream?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }
