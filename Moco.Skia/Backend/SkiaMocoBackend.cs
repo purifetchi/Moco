@@ -32,6 +32,11 @@ public class SkiaMocoBackend : IMocoRendererBackend
     /// </summary>
     private SKSurface _surface = null!;
 
+    /// <summary>
+    /// The background skia color.
+    /// </summary>
+    private SKColor _bgColor = SKColors.Black;
+
     public SkiaMocoBackend()
     {
         // Create the Silk window that will be drawn into.
@@ -60,7 +65,7 @@ public class SkiaMocoBackend : IMocoRendererBackend
             using var canvas = _surface.Canvas;
 
             _context.ResetContext();
-            canvas.Clear(SKColors.Black);
+            canvas.Clear(_bgColor);
 
             canvas.Flush();
         };
@@ -77,7 +82,8 @@ public class SkiaMocoBackend : IMocoRendererBackend
     /// <inheritdoc/>
     public void SetBackgroundClearColor(Rgb color)
     {
-        
+        _bgColor = new SKColor(color.Red, color.Green, color.Blue);
+        Console.WriteLine($"Setting background color: {color.Red}, {color.Green}, {color.Blue}");
     }
 
     /// <inheritdoc/>

@@ -1,6 +1,7 @@
 ﻿using Moco.Rendering;
 using Moco.SWF;
 using Moco.SWF.Serialization;
+using Moco.SWF.Tags.Control;
 
 namespace Moco;
 
@@ -37,6 +38,10 @@ public class MocoEngine
             return;
 
         Backend?.SetWindowSize(Swf.FrameSize);
+
+        var bgTag = Swf.GetTag<SetBackgroundColor>();
+        if (bgTag is not null)
+            Backend?.SetBackgroundClearColor(bgTag.BackgroundColor);
     }
 
     /// <summary>

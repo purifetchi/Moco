@@ -46,6 +46,18 @@ public class Swf
         FrameCount = header.FrameCount;
         Version = header.Version;
     }
+    
+    /// <summary>
+    /// Tries to get a tag from within the swf.
+    /// </summary>
+    /// <typeparam name="TTag">The tag.</typeparam>
+    /// <returns>The tag, or nothing.</returns>
+    public TTag? GetTag<TTag>()
+        where TTag : Tag
+    {
+        var tag = _tags.FirstOrDefault(tag => tag is TTag) as TTag;
+        return tag;
+    }
 
     /// <summary>
     /// Adds a tag.
