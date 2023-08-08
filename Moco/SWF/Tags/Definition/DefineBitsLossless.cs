@@ -130,7 +130,7 @@ public class DefineBitsLossless : Tag,
                 data[pixelIndex] = rgb.Red;
                 data[pixelIndex + 1] = rgb.Green;
                 data[pixelIndex + 2] = rgb.Blue;
-                pixelIndex += 1;
+                pixelIndex += 3;
             }
 
             for (var x = 0; x < padding; x++)
