@@ -15,7 +15,7 @@ internal ref struct BitReader
     /// <summary>
     /// The last read byte.
     /// </summary>
-    private byte _lastByte;
+    private byte _lastByte = 0x00;
 
     /// <summary>
     /// The position.
