@@ -4,6 +4,7 @@ using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
+using Moco.SWF.Tags.Definition;
 
 namespace Moco.SWF.Serialization;
 
@@ -181,7 +182,8 @@ public class SwfReader : IDisposable
 
         var tag = record.Type switch
         {
-            TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this),
+            TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this, record),
+            TagType.DefineBitsLossless => new DefineBitsLossless().Parse(this, record),
             _ => null!
         };
 
@@ -190,6 +192,15 @@ public class SwfReader : IDisposable
             _reader.ReadBytes(record.Length);
 
         return tag!;
+    }
+
+    /// <summary>
+    /// Gets the underlying binary reader.
+    /// </summary>
+    /// <returns>The binary reader.</returns>
+    internal BinaryReader GetBinaryReader()
+    {
+        return _reader;
     }
 
     /// <inheritdoc/>

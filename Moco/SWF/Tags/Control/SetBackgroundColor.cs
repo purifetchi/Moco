@@ -1,5 +1,6 @@
 ﻿using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
+using Moco.SWF.Serialization.Internal;
 
 namespace Moco.SWF.Tags.Control;
 
@@ -20,7 +21,7 @@ public class SetBackgroundColor : Tag
     public Rgb BackgroundColor { get; private set; }
 
     /// <inheritdoc/>
-    internal override Tag Parse(SwfReader reader)
+    internal override Tag Parse(SwfReader reader, RecordHeader _)
     {
         BackgroundColor = reader.ReadRGBRecord();
         return this;

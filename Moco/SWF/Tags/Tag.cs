@@ -1,4 +1,5 @@
 ﻿using Moco.SWF.Serialization;
+using Moco.SWF.Serialization.Internal;
 
 namespace Moco.SWF.Tags;
 
@@ -21,6 +22,7 @@ public abstract class Tag
     /// Parses this tag.
     /// </summary>
     /// <param name="reader">The swf reader.</param>
+    /// <param name="header">The header of the tag.</param>
     /// <returns>This tag.</returns>
-    internal abstract Tag Parse(SwfReader reader);
+    internal abstract Tag Parse(SwfReader reader, RecordHeader header);
 }
