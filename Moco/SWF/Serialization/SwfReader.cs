@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Buffers.Binary;
+using System.IO.Compression;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 
@@ -36,6 +37,7 @@ public class SwfReader : IDisposable
         _reader = new BinaryReader(_readerStream);
 
         var header = ReadHeader();
+        var recordHeader = ReadRecordHeader();
     }
 
     /// <summary>
@@ -77,6 +79,24 @@ public class SwfReader : IDisposable
             XMax = new Twip(br.ReadSignedBits(nbits)),
             YMin = new Twip(br.ReadSignedBits(nbits)),
             YMax = new Twip(br.ReadSignedBits(nbits)),
+        };
+    }
+
+    /// <summary>
+    /// Reads the record header for a tag.
+    /// </summary>
+    /// <returns>The record header.</returns>
+    internal RecordHeader ReadRecordHeader()
+    {
+        const short shortHeaderTypeBitMask = 0b111111111100000;
+        const short shortHeaderLengthBitMask = ~shortHeaderTypeBitMask;
+
+        var value = _reader.ReadUInt16();
+
+        return new RecordHeader
+        {
+            Type = (ushort)((value & shortHeaderTypeBitMask) >> 6),
+            Length = (ushort)(value & shortHeaderLengthBitMask)
         };
     }
 

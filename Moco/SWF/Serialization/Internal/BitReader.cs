@@ -29,6 +29,7 @@ internal ref struct BitReader
     public BitReader(BinaryReader reader)
     {
         _reader = reader;
+        Console.WriteLine("------");
     }
 
     /// <summary>
