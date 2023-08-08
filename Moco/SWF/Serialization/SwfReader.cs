@@ -37,19 +37,6 @@ public class SwfReader : IDisposable
         _baseStream = fs;
         _readerStream = ConstructUnderlyingStream(fs);
         _reader = new BinaryReader(_readerStream);
-
-        var header = ReadHeader();
-        while (true)
-        {
-            try
-            {
-                ReadTag();
-            }
-            catch
-            {
-                break;
-            }
-        }
     }
 
     /// <summary>
@@ -73,6 +60,29 @@ public class SwfReader : IDisposable
             SwfCompressionMode.Lzma => throw new NotSupportedException("Lzma compression not yet supported."),
             _ => throw new NotAnSwfException()
         };
+    }
+
+    /// <summary>
+    /// Reads the swf file.
+    /// </summary>
+    /// <returns>The swf object.</returns>
+    public Swf ReadSwf()
+    {
+        var swf = new Swf(ReadHeader());
+
+        while (true)
+        {
+            try
+            {
+                swf.AddTag(ReadTag());
+            }
+            catch
+            {
+                break;
+            }
+        }
+
+        return swf;
     }
 
     /// <summary>
