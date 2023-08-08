@@ -29,7 +29,6 @@ internal ref struct BitReader
     public BitReader(BinaryReader reader)
     {
         _reader = reader;
-        Console.WriteLine("------");
     }
 
     /// <summary>
@@ -42,7 +41,6 @@ internal ref struct BitReader
         if (_position >= bitsInByte)
         {
             _lastByte = _reader.ReadByte();
-            Console.WriteLine($"Reading byte {_lastByte:X2}");
             _position = 0;
         }
     }

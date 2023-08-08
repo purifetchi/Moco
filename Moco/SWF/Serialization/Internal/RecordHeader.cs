@@ -1,4 +1,6 @@
-﻿namespace Moco.SWF.Serialization.Internal;
+﻿using Moco.SWF.Tags;
+
+namespace Moco.SWF.Serialization.Internal;
 
 /// <summary>
 /// The record header, preeceding the tag.
@@ -8,10 +10,10 @@ public struct RecordHeader
     /// <summary>
     /// The tag type.
     /// </summary>
-    public ushort Type { get; set; }
+    public TagType Type { get; set; }
 
     /// <summary>
     /// The tag length.
     /// </summary>
-    public ushort Length { get; set; }
+    public int Length { get; set; }
 }

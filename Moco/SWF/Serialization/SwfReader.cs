@@ -1,7 +1,8 @@
-﻿using System.Buffers.Binary;
-using System.IO.Compression;
+﻿using System.IO.Compression;
+using System.Reflection.PortableExecutable;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
+using Moco.SWF.Tags;
 
 namespace Moco.SWF.Serialization;
 
@@ -37,7 +38,17 @@ public class SwfReader : IDisposable
         _reader = new BinaryReader(_readerStream);
 
         var header = ReadHeader();
-        var recordHeader = ReadRecordHeader();
+        while (true)
+        {
+            try
+            {
+                ReadTag();
+            }
+            catch
+            {
+                break;
+            }
+        }
     }
 
     /// <summary>
@@ -88,15 +99,25 @@ public class SwfReader : IDisposable
     /// <returns>The record header.</returns>
     internal RecordHeader ReadRecordHeader()
     {
-        const short shortHeaderTypeBitMask = 0b111111111100000;
-        const short shortHeaderLengthBitMask = ~shortHeaderTypeBitMask;
+        const int shortHeaderTypeBitMask = 0b1111111111000000;
+        const int shortHeaderLengthBitMask = ~shortHeaderTypeBitMask;
+
+        // The long tag header consists of
+        // a short tag header with a length of 0x3f, followed by a 32-bit length
+        const short longFormatHeaderMagic = 0x3F;
 
         var value = _reader.ReadUInt16();
+        var type = (TagType)((value & shortHeaderTypeBitMask) >> 6);
+        var length = value & shortHeaderLengthBitMask;
+
+        // Check if we're dealing with a long format record header.
+        if (length == longFormatHeaderMagic)
+            length = _reader.ReadInt32();
 
         return new RecordHeader
         {
-            Type = (ushort)((value & shortHeaderTypeBitMask) >> 6),
-            Length = (ushort)(value & shortHeaderLengthBitMask)
+            Type = type,
+            Length = length
         };
     }
 
@@ -122,6 +143,21 @@ public class SwfReader : IDisposable
             FrameRate = _reader.ReadUInt16(),
             FrameCount = _reader.ReadUInt16()
         };
+    }
+
+    /// <summary>
+    /// Reads an swf tag.
+    /// </summary>
+    /// <returns>The tag.</returns>
+    internal Tag ReadTag()
+    {
+        var record = ReadRecordHeader();
+        Console.WriteLine($"Read tag {record.Type} of length {record.Length}");
+
+        // TODO(pref): Actually read the tag.
+        _reader.ReadBytes(record.Length);
+
+        return new Tag();
     }
 
     /// <inheritdoc/>
