@@ -264,11 +264,12 @@ public class SwfReader : IDisposable
     internal List<IShapeRecord> ReadShapeRecordsList(ShapeRecordReadingContext ctx)
     {
         var list = new List<IShapeRecord>();
+        var br = new BitReader(_reader);
 
         IShapeRecord record;
         do
         {
-            record = ReadShapeRecord(ctx);
+            record = ReadShapeRecord(ref br, ctx);
             list.Add(record);
         } while (record is not EndShapeRecord);
 
@@ -278,12 +279,13 @@ public class SwfReader : IDisposable
     /// <summary>
     /// Reads a single shape record.
     /// </summary>
+    /// <param name="br">The bit reader to read from.</param>
     /// <param name="ctx">The reading context.</param>
     /// <returns>The shape record.</returns>
-    internal IShapeRecord ReadShapeRecord(ShapeRecordReadingContext ctx)
+    internal IShapeRecord ReadShapeRecord(
+        ref BitReader br,
+        ShapeRecordReadingContext ctx)
     {
-        var br = new BitReader(_reader);
-
         var type = (ShapeRecordType)br.ReadBit();
         Console.WriteLine($"[ReadShapeRecord] Beginning to read record of type {type}");
 
@@ -303,7 +305,12 @@ public class SwfReader : IDisposable
         }
         else
         {
-            throw new MocoTodoException($"Read record of type {type}.");
+            // Decides whether this is a straight edge record or a curved one.
+            var isStraight = br.ReadBitFlag();
+            if (isStraight)
+                return new StraightEdgeRecord().Parse(ref br);
+            else
+                throw new MocoTodoException("Parse a curved edge record.");
         }
     }
 
