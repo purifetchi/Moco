@@ -123,4 +123,13 @@ internal ref struct BitReader
 
         return integerPart + (fractionalPart * fractionalDivisor);
     }
+
+    /// <summary>
+    /// Rewinds a select amount of bits.
+    /// </summary>
+    /// <param name="bits">The amount of bits.</param>
+    public void Rewind(sbyte bits)
+    {
+        _position -= bits;
+    }
 }

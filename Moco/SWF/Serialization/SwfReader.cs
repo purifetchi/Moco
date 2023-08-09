@@ -8,6 +8,7 @@ using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
 using Moco.SWF.Tags.Definition.Shapes;
+using Moco.SWF.Tags.Definition.Shapes.Records;
 
 namespace Moco.SWF.Serialization;
 
@@ -253,6 +254,56 @@ public class SwfReader : IDisposable
             Width = _reader.ReadUInt16(),
             Color = ReadRGBRecord()
         };
+    }
+
+    /// <summary>
+    /// Reads a list of shape records.
+    /// </summary>
+    /// <returns>The shape record list.</returns>
+    internal List<IShapeRecord> ReadShapeRecordsList()
+    {
+        var list = new List<IShapeRecord>();
+
+        IShapeRecord record;
+        do
+        {
+            record = ReadShapeRecord();
+            list.Add(record);
+        } while (record is not EndShapeRecord);
+
+        return list;
+    }
+
+    /// <summary>
+    /// Reads a single shape record.
+    /// </summary>
+    /// <returns>The shape record.</returns>
+    internal IShapeRecord ReadShapeRecord()
+    {
+        var br = new BitReader(_reader);
+
+        var type = (ShapeRecordType)br.ReadBit();
+        Console.WriteLine($"[ReadShapeRecord] Beginning to read record of type {type}");
+
+        if (type == ShapeRecordType.NonEdgeRecord)
+        {
+            // Bits required to be read to see if this is an end record.
+            const int bitsForEndMarker = 5;
+
+            // If the end bits are all 0, then we're dealing with an end shape record
+            // we can bail here.
+            var endBits = (sbyte)br.ReadUnsignedBits(bitsForEndMarker);
+            if (endBits == 0)
+                return new EndShapeRecord();
+
+            // Otherwise we're dealing with a StyleChangeRecord.
+            br.Rewind(endBits);
+            throw new MocoTodoException($"Read StyleChangeRecord.");
+        }
+        else
+        {
+            throw new MocoTodoException($"Read record of type {type}.");
+        }
     }
 
     /// <summary>

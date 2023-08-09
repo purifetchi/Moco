@@ -31,7 +31,7 @@ public class DefineShape : Tag,
     /// <summary>
     /// The shape with style.
     /// </summary>
-    public ShapeWithStyle ShapeWithStyle { get; private set; }
+    public ShapeWithStyle? ShapeWithStyle { get; private set; }
 
     /// <inheritdoc/>
     internal override Tag Parse(SwfReader reader, RecordHeader header)
@@ -59,8 +59,12 @@ public class DefineShape : Tag,
         for (var i = 0; i < lineStyleCount; i++)
             lineStyles[i] = reader.ReadLineStyle();
 
-        // TODO(pref): Read shape records.
-        throw new MocoTodoException(TagType.DefineShape, "Start reading shape records.");
+        var records = reader.ReadShapeRecordsList();
+
+        ShapeWithStyle = new ShapeWithStyle(
+            fillStyles,
+            lineStyles,
+            records);
 
         return this;
     }

@@ -1,4 +1,6 @@
-﻿namespace Moco.SWF.Tags.Definition.Shapes;
+﻿using Moco.SWF.Tags.Definition.Shapes.Records;
+
+namespace Moco.SWF.Tags.Definition.Shapes;
 
 /// <summary>
 /// The SHAPEWITHSTYLE structure extends the SHAPE structure by including fill style and
@@ -17,15 +19,22 @@ public class ShapeWithStyle
     public LineStyle[] LineStyles { get; private set; }
 
     /// <summary>
+    /// The shape records.
+    /// </summary>
+    public List<IShapeRecord> ShapeRecords { get; private set; }
+
+    /// <summary>
     /// Constructs a new shape with style.
     /// </summary>
     /// <param name="fillStyles">The fill styles.</param>
     /// <param name="lineStyles">The line styles.</param>
     public ShapeWithStyle(
         FillStyle[] fillStyles,
-        LineStyle[] lineStyles)
+        LineStyle[] lineStyles,
+        List<IShapeRecord> shapeRecords)
     {
         FillStyles = fillStyles;
         LineStyles = lineStyles;
+        ShapeRecords = shapeRecords;
     }
 }
