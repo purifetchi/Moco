@@ -63,6 +63,15 @@ internal ref struct BitReader
     }
 
     /// <summary>
+    /// Reads a bit as a flag.
+    /// </summary>
+    /// <returns>The flag.</returns>
+    public bool ReadBitFlag()
+    {
+        return ReadBit() != 0;
+    }
+
+    /// <summary>
     /// Reads a given amount of bits as a signed integer.
     /// </summary>
     /// <param name="bits">The amount of bits.</param>

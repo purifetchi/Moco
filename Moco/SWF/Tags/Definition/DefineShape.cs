@@ -59,7 +59,11 @@ public class DefineShape : Tag,
         for (var i = 0; i < lineStyleCount; i++)
             lineStyles[i] = reader.ReadLineStyle();
 
-        var records = reader.ReadShapeRecordsList();
+        var br = new BitReader(reader.GetBinaryReader());
+        var numFillBits = br.ReadUnsignedBits(4);
+        var numLineBits = br.ReadUnsignedBits(4);
+
+        var records = reader.ReadShapeRecordsList(new ShapeRecordReadingContext(numFillBits, numLineBits));
 
         ShapeWithStyle = new ShapeWithStyle(
             fillStyles,

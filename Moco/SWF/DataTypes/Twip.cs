@@ -21,6 +21,11 @@ public readonly struct Twip
     public float LogicalPixelValue => Value * LOGICAL_PIXEL_SCALING_FACTOR;
 
     /// <summary>
+    /// Constructs a new zero twip.
+    /// </summary>
+    public static Twip Zero { get; } = new Twip(0);
+
+    /// <summary>
     /// Constructs a twip from an int.
     /// </summary>
     /// <param name="value">The value.</param>

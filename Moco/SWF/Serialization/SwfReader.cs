@@ -259,15 +259,16 @@ public class SwfReader : IDisposable
     /// <summary>
     /// Reads a list of shape records.
     /// </summary>
+    /// <param name="ctx">The reading context.</param>
     /// <returns>The shape record list.</returns>
-    internal List<IShapeRecord> ReadShapeRecordsList()
+    internal List<IShapeRecord> ReadShapeRecordsList(ShapeRecordReadingContext ctx)
     {
         var list = new List<IShapeRecord>();
 
         IShapeRecord record;
         do
         {
-            record = ReadShapeRecord();
+            record = ReadShapeRecord(ctx);
             list.Add(record);
         } while (record is not EndShapeRecord);
 
@@ -277,8 +278,9 @@ public class SwfReader : IDisposable
     /// <summary>
     /// Reads a single shape record.
     /// </summary>
+    /// <param name="ctx">The reading context.</param>
     /// <returns>The shape record.</returns>
-    internal IShapeRecord ReadShapeRecord()
+    internal IShapeRecord ReadShapeRecord(ShapeRecordReadingContext ctx)
     {
         var br = new BitReader(_reader);
 
@@ -292,13 +294,12 @@ public class SwfReader : IDisposable
 
             // If the end bits are all 0, then we're dealing with an end shape record
             // we can bail here.
-            var endBits = (sbyte)br.ReadUnsignedBits(bitsForEndMarker);
-            if (endBits == 0)
+            var flags = (StyleChangeRecordFlags)br.ReadUnsignedBits(bitsForEndMarker);
+            if (flags == StyleChangeRecordFlags.IsEndMarker)
                 return new EndShapeRecord();
 
-            // Otherwise we're dealing with a StyleChangeRecord.
-            br.Rewind(endBits);
-            throw new MocoTodoException($"Read StyleChangeRecord.");
+            return new StyleChangeRecord(flags)
+                .Parse(ref br, ctx);
         }
         else
         {
