@@ -80,12 +80,12 @@ internal ref struct BitReader
     {
         int value = (int)ReadUnsignedBits(bits);
 
-        // When a signed-bit value is expanded into a larger word size, the high bit is copied
-        // to the leftmost bits.
-        if ((value & (1 << (int)bits)) != 0)
+        // When a signed-bit value is expanded into a larger word size, 
+        // the high bit is copied to the leftmost bits.
+        if ((value & (1 << (int)(bits - 1))) != 0)
         {
-            value &= ~(1 << (int)bits);
-            value |= (1 << sizeof(int) - 1);
+            var mask = (1 << (int)bits) - 1;
+            value |= ~mask;
         }
 
         return value;
