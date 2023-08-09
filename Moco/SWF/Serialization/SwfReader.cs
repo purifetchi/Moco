@@ -111,13 +111,29 @@ public class SwfReader : IDisposable
     /// Reads an RGB record.
     /// </summary>
     /// <returns>The RGB record.</returns>
-    internal Rgb ReadRGBRecord()
+    internal Rgba ReadRGBRecord()
     {
-        return new Rgb
+        return new Rgba
         {
             Red = _reader.ReadByte(),
             Green = _reader.ReadByte(),
             Blue = _reader.ReadByte(),
+            Alpha = 255
+        };
+    }
+
+    /// <summary>
+    /// Reads an RGBA record.
+    /// </summary>
+    /// <returns>The RGBA record.</returns>
+    internal Rgba ReadRGBARecord()
+    {
+        return new Rgba
+        {
+            Red = _reader.ReadByte(),
+            Green = _reader.ReadByte(),
+            Blue = _reader.ReadByte(),
+            Alpha = _reader.ReadByte()
         };
     }
 
@@ -224,6 +240,8 @@ public class SwfReader : IDisposable
     /// <returns>The line style.</returns>
     internal LineStyle ReadLineStyle()
     {
+        // TODO(pref): Read an RGBA record for Shape3.
+        // TODO(pref): Support LineStyle2 (DefineShape4).
         return new LineStyle
         {
             Width = _reader.ReadUInt16(),
@@ -268,7 +286,7 @@ public class SwfReader : IDisposable
         {
             TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this, record),
             TagType.DefineBitsLossless => new DefineBitsLossless().Parse(this, record),
-            TagType.DefineShape => new DefineShape().Parse(this, record),
+            //TagType.DefineShape => new DefineShape().Parse(this, record),
             _ => null!
         };
 

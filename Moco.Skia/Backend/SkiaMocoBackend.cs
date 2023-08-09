@@ -80,7 +80,7 @@ public class SkiaMocoBackend : IMocoRendererBackend
     }
 
     /// <inheritdoc/>
-    public void SetBackgroundClearColor(Rgb color)
+    public void SetBackgroundClearColor(Rgba color)
     {
         _bgColor = new SKColor(color.Red, color.Green, color.Blue);
         Console.WriteLine($"Setting background color: {color.Red}, {color.Green}, {color.Blue}");

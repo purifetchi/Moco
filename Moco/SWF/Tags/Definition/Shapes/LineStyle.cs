@@ -15,6 +15,5 @@ public class LineStyle
     /// <summary>
     /// The color value.
     /// </summary>
-    // TODO(pref): Support Rgba for Shape3.
-    public Rgb Color { get; set; }
+    public Rgba Color { get; set; }
 }

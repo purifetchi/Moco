@@ -1,9 +1,10 @@
 ﻿namespace Moco.SWF.DataTypes;
 
 /// <summary>
-/// The RGB record represents a color as a 24-bit red, green, and blue value.
+/// The RGBA record represents a color as 32-bit red, green, blue and alpha value. An RGBA
+/// color with an alpha value of 255 is completely opaque.
 /// </summary>
-public struct Rgb
+public struct Rgba
 {
     /// <summary>
     /// The red channel.
@@ -19,4 +20,9 @@ public struct Rgb
     /// The blue channel.
     /// </summary>
     public byte Blue { get; set; }
+
+    /// <summary>
+    /// The alpha channel.
+    /// </summary>
+    public byte Alpha { get; set; }
 }

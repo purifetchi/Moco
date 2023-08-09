@@ -15,8 +15,7 @@ public class FillStyle
     /// <summary>
     /// Solid fill color with transparency information.
     /// </summary>
-    // TODO(pref): Support the RGBA record, used by DefineShape3.
-    public Rgb Color { get; private set; }
+    public Rgba Color { get; private set; }
 
     // TODO(pref): skipped GradientMatrix, Gradient
 

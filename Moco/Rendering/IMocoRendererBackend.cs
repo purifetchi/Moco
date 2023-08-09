@@ -17,7 +17,7 @@ public interface IMocoRendererBackend
     /// Sets the background clear color.
     /// </summary>
     /// <param name="color">The clear color.</param>
-    void SetBackgroundClearColor(Rgb color);
+    void SetBackgroundClearColor(Rgba color);
 
     /// <summary>
     /// Registers image bytes.

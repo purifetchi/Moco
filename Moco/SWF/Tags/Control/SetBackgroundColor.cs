@@ -18,7 +18,7 @@ public class SetBackgroundColor : Tag
     /// <summary>
     /// Color of the display background.
     /// </summary>
-    public Rgb BackgroundColor { get; private set; }
+    public Rgba BackgroundColor { get; private set; }
 
     /// <inheritdoc/>
     internal override Tag Parse(SwfReader reader, RecordHeader _)
