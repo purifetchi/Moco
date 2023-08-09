@@ -9,13 +9,17 @@ namespace Moco.SWF.Tags.Definition;
 /// Defines a lossless bitmap character that contains RGB bitmap data compressed with ZLIB.
 /// </summary>
 public class DefineBitsLossless : Tag,
-    ICharacterDefinitionTag
+    ICharacterDefinitionTag,
+    IVersionedTag
 {
     /// <inheritdoc/>
     public override TagType Type => TagType.DefineBitsLossless;
 
     /// <inheritdoc/>
     public override int MinimumVersion => 2;
+
+    /// <inheritdoc/>
+    public int Version { get; init; }
 
     /// <summary>
     /// The character id.
@@ -41,6 +45,15 @@ public class DefineBitsLossless : Tag,
     /// The bitmap color table size.
     /// </summary>
     public byte BitmapColorTableSize { get; private set; } = 0;
+
+    /// <summary>
+    /// Creates a new define bits lossless tag and sets its version.
+    /// </summary>
+    /// <param name="version">The version.</param>
+    public DefineBitsLossless(int version = 1)
+    {
+        Version = 1;
+    }
 
     /// <inheritdoc/>
     internal override Tag Parse(SwfReader reader, RecordHeader header)
@@ -77,6 +90,9 @@ public class DefineBitsLossless : Tag,
         using var ms = new MemoryStream(data);
         using var zlibStream = new ZLibStream(ms, CompressionMode.Decompress);
         using var reader = new BinaryReader(zlibStream);
+
+        if (Version != 1)
+            throw new NotSupportedException("DefineBitsLossless2 not yet supported!");
 
         var pixels = BitmapFormat switch
         {

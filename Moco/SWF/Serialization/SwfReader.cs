@@ -285,7 +285,8 @@ public class SwfReader : IDisposable
         var tag = record.Type switch
         {
             TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this, record),
-            TagType.DefineBitsLossless => new DefineBitsLossless().Parse(this, record),
+            TagType.DefineBitsLossless => new DefineBitsLossless(version: 1).Parse(this, record),
+            TagType.DefineBitsLossless2 => new DefineBitsLossless(version: 2).Parse(this, record),
             //TagType.DefineShape => new DefineShape().Parse(this, record),
             _ => null!
         };
