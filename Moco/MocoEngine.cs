@@ -2,6 +2,7 @@
 using Moco.SWF;
 using Moco.SWF.Serialization;
 using Moco.SWF.Tags.Control;
+using Moco.SWF.Tags.Definition;
 
 namespace Moco;
 
@@ -45,6 +46,23 @@ public class MocoEngine
     }
 
     /// <summary>
+    /// Registers all of the characters.
+    /// </summary>
+    private void RegisterCharacters()
+    {
+        if (Swf is null)
+            return;
+
+        foreach (var tag in Swf.Tags)
+        {
+            if (tag is not ICharacterDefinitionTag characterDefinitionTag)
+                continue;
+
+            Console.WriteLine($"Registering character of type {tag.Type} and id [{characterDefinitionTag.CharacterId}]");
+        }
+    }
+
+    /// <summary>
     /// Loads an swf.
     /// </summary>
     /// <param name="filename">The swf.</param>
@@ -53,6 +71,7 @@ public class MocoEngine
         using var reader = new SwfReader(filename);
         Swf = reader.ReadSwf();
 
+        RegisterCharacters();
         PrepareWindow();
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.IO.Compression;
-using System.Reflection.PortableExecutable;
+﻿using System.IO.Compression;
 using Moco.Exceptions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
@@ -75,7 +73,7 @@ public class SwfReader : IDisposable
     {
         var swf = new Swf(ReadHeader());
 
-        while (true)
+        while (swf.GetTag<End>() is null)
         {
             try
             {
@@ -85,10 +83,6 @@ public class SwfReader : IDisposable
             {
                 Console.WriteLine(e.Message);
                 Environment.Exit(1);
-            }
-            catch
-            {
-                break;
             }
         }
 
@@ -347,20 +341,25 @@ public class SwfReader : IDisposable
         var record = ReadRecordHeader();
         Console.WriteLine($"Read tag {record.Type} of length {record.Length}");
 
-        var tag = record.Type switch
+        Tag tag = record.Type switch
         {
-            TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this, record),
-            TagType.DefineBitsLossless => new DefineBitsLossless(version: 1).Parse(this, record),
-            TagType.DefineBitsLossless2 => new DefineBitsLossless(version: 2).Parse(this, record),
-            TagType.DefineShape => new DefineShape().Parse(this, record),
+            TagType.SetBackgroundColor => new SetBackgroundColor(),
+            TagType.DefineBitsLossless => new DefineBitsLossless(version: 1),
+            TagType.DefineBitsLossless2 => new DefineBitsLossless(version: 2),
+            TagType.DefineShape => new DefineShape(),
+            TagType.ShowFrame => new ShowFrame(),
+            TagType.End => new End(),
             _ => null!
         };
 
         // If we haven't implemented this tag, skip the length.
         if (tag is null)
+        {
             _reader.ReadBytes(record.Length);
+            return tag!;
+        }
 
-        return tag!;
+        return tag!.Parse(this, record);
     }
 
     /// <summary>

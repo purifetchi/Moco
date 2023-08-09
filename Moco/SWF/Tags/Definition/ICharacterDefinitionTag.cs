@@ -5,5 +5,8 @@
 /// </summary>
 public interface ICharacterDefinitionTag
 {
-
+    /// <summary>
+    /// The defined character id.
+    /// </summary>
+    ushort CharacterId { get; }
 }

@@ -48,6 +48,11 @@ public class DefineBitsLossless : Tag,
     public byte BitmapColorTableSize { get; private set; } = 0;
 
     /// <summary>
+    /// The decoded pixel map.
+    /// </summary>
+    public byte[]? Pixmap { get; private set; }
+
+    /// <summary>
     /// Creates a new define bits lossless tag and sets its version.
     /// </summary>
     /// <param name="version">The version.</param>
@@ -107,7 +112,7 @@ public class DefineBitsLossless : Tag,
             return;
         }
 
-        // TODO(pref): Tell the backend to preload the image.
+        Pixmap = pixels;
     }
 
     /// <summary>

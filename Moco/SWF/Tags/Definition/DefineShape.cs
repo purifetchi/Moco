@@ -21,7 +21,7 @@ public class DefineShape : Tag,
     /// <summary>
     /// The id of the shape.
     /// </summary>
-    public ushort ShapeId { get; private set; }
+    public ushort CharacterId { get; private set; }
 
     /// <summary>
     /// The shape bounds.
@@ -36,7 +36,7 @@ public class DefineShape : Tag,
     /// <inheritdoc/>
     internal override Tag Parse(SwfReader reader, RecordHeader header)
     {
-        ShapeId = reader.GetBinaryReader().ReadUInt16();
+        CharacterId = reader.GetBinaryReader().ReadUInt16();
         ShapeBounds = reader.ReadRectangleRecord();
 
         // Read the fill styles array.
