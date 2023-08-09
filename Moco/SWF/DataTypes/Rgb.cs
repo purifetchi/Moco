@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Moco.SWF.DataTypes;
+﻿namespace Moco.SWF.DataTypes;
 
 /// <summary>
 /// The RGB record represents a color as a 24-bit red, green, and blue value.

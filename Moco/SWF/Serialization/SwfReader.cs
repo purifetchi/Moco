@@ -1,10 +1,12 @@
-﻿using System.IO.Compression;
+﻿using System.ComponentModel.DataAnnotations;
+using System.IO.Compression;
 using System.Reflection.PortableExecutable;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
+using Moco.SWF.Tags.Definition.Shapes;
 
 namespace Moco.SWF.Serialization;
 
@@ -148,6 +150,88 @@ public class SwfReader : IDisposable
     }
 
     /// <summary>
+    /// Reads a single matrix record.
+    /// </summary>
+    /// <returns>The matrix record.</returns>
+    internal Matrix ReadMatrixRecord()
+    {
+        const int bitSizeForXBitsFields = 5;
+
+        var br = new BitReader(_reader);
+
+        var hasScale = br.ReadBit();
+        float scaleX = 1f, scaleY = 1f;
+        if (hasScale == 1)
+        {
+            var nScaleBits = br.ReadUnsignedBits(bitSizeForXBitsFields);
+            scaleX = br.ReadFloatingBits(nScaleBits);
+            scaleY = br.ReadFloatingBits(nScaleBits);
+        }
+
+        var hasRotate = br.ReadBit();
+        float rotateSkew0 = 0f, rotateSkew1 = 0f;
+        if (hasRotate == 1)
+        {
+            var nRotateBits = br.ReadUnsignedBits(bitSizeForXBitsFields);
+            rotateSkew0 = br.ReadFloatingBits(nRotateBits);
+            rotateSkew1 = br.ReadFloatingBits(nRotateBits);
+        }
+
+        var nTranslateBits = br.ReadUnsignedBits(bitSizeForXBitsFields);
+        var translateX = new Twip(br.ReadSignedBits(nTranslateBits));
+        var translateY = new Twip(br.ReadSignedBits(nTranslateBits));
+
+        return new Matrix
+        {
+            HasScale = hasScale == 1,
+            ScaleX = scaleX,
+            ScaleY = scaleY,
+
+            HasRotation = hasRotate == 1,
+            RotateSkew0 = rotateSkew0,
+            RotateSkew1 = rotateSkew1,
+
+            TranslateX = translateX,
+            TranslateY = translateY
+        };
+    }
+
+    /// <summary>
+    /// Reads a single fill style.
+    /// </summary>
+    /// <returns>The fill style.</returns>
+    internal FillStyle ReadFillStyle()
+    {
+        var type = (FillStyleType)_reader.ReadByte();
+
+        if (type != FillStyleType.RepeatingBitmap &&
+            type != FillStyleType.ClippedBitmap &&
+            type != FillStyleType.NonSmoothedRepeatingBitmap &&
+            type != FillStyleType.NonSmoothedClippedBitmap)
+        {
+            throw new NotSupportedException($"Fill type {type} is not yet supported.");
+        }
+
+        var bitmapId = _reader.ReadUInt16();
+        var bitmapMatrix = ReadMatrixRecord();
+
+        return new FillStyle(type, bitmapId, bitmapMatrix);
+    }
+
+    /// <summary>
+    /// Reads a single line style.
+    /// </summary>
+    /// <returns>The line style.</returns>
+    internal LineStyle ReadLineStyle()
+    {
+        return new LineStyle
+        {
+            Width = _reader.ReadUInt16(),
+            Color = ReadRGBRecord()
+        };
+    }
+
+    /// <summary>
     /// Reads the header of this swf file.
     /// </summary>
     /// <returns>The header.</returns>
@@ -184,6 +268,7 @@ public class SwfReader : IDisposable
         {
             TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this, record),
             TagType.DefineBitsLossless => new DefineBitsLossless().Parse(this, record),
+            TagType.DefineShape => new DefineShape().Parse(this, record),
             _ => null!
         };
 

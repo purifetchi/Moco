@@ -113,6 +113,7 @@ internal ref struct BitReader
             throw new Exception("My assumption about floating bits was wrong lol");
 
         var value = ReadSignedBits(bits);
+        Console.WriteLine($"[ReadFloatingBits] Value => {value}");
 
         // Split the value into two.
         var fractionalPart = value & (fractionalPartMask);
