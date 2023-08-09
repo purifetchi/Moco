@@ -18,4 +18,11 @@ public interface IMocoRendererBackend
     /// </summary>
     /// <param name="color">The clear color.</param>
     void SetBackgroundClearColor(Rgb color);
+
+    /// <summary>
+    /// Registers image bytes.
+    /// </summary>
+    /// <param name="id">The id to register them under.</param>
+    /// <param name="data">The data.</param>
+    void RegisterImageBytes(int id, byte[] data);
 }

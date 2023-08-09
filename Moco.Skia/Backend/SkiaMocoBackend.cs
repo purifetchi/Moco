@@ -105,4 +105,10 @@ public class SkiaMocoBackend : IMocoRendererBackend
 
         Console.WriteLine($"Setting window size: {rect.XMax.LogicalPixelValue}x{rect.YMax.LogicalPixelValue}");
     }
+
+    /// <inheritdoc/>
+    public void RegisterImageBytes(int id, byte[] bytes)
+    {
+
+    }
 }

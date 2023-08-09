@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Security.Cryptography.X509Certificates;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
@@ -75,25 +74,30 @@ public class DefineBitsLossless : Tag,
     /// <param name="data">The image data.</param>
     private void LoadImageData(byte[] data)
     {
-        var ms = new MemoryStream(data);
-        var zlibStream = new ZLibStream(ms, CompressionMode.Decompress);
-        var reader = new BinaryReader(zlibStream);
+        using var ms = new MemoryStream(data);
+        using var zlibStream = new ZLibStream(ms, CompressionMode.Decompress);
+        using var reader = new BinaryReader(zlibStream);
 
-        // If the bitmap format isnt
-        if (BitmapFormat != 3)
+        var pixels = BitmapFormat switch
         {
-            Console.WriteLine("Non-indexed formats not yet supported.");
+            3 => ReadIndexedColorMap(reader),
+            _ => null!
+        };
+
+        if (pixels is null)
+        {
+            Console.WriteLine($"[DefineBitsLossless] Unsupported format {BitmapFormat}.");
             return;
         }
 
-        ReadIndexedColorMap(reader);
+        // TODO(pref): Tell the backend to preload the image.
     }
 
     /// <summary>
     /// Reads the indexed color map.
     /// </summary>
     /// <param name="reader">The reader.</param>
-    private unsafe void ReadIndexedColorMap(BinaryReader reader)
+    private unsafe byte[] ReadIndexedColorMap(BinaryReader reader)
     {
         // Read the color table.
         var colorTable = new Rgb[BitmapColorTableSize + 1];
@@ -136,5 +140,7 @@ public class DefineBitsLossless : Tag,
             for (var x = 0; x < padding; x++)
                 reader.ReadByte();
         }
+
+        return data;
     }
 }
