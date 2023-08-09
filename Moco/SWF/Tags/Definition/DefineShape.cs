@@ -1,4 +1,5 @@
-﻿using Moco.SWF.DataTypes;
+﻿using Moco.Exceptions;
+using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags.Definition.Shapes;
@@ -42,7 +43,7 @@ public class DefineShape : Tag,
         // TODO(pref): Support the extended count.
         var fillStyleCount = reader.GetBinaryReader().ReadByte();
         if (fillStyleCount == 0xFF)
-            throw new NotSupportedException("Extended count not yet supported.");
+            throw new MocoTodoException(TagType.DefineShape, "Extended count not yet supported.");
 
         var fillStyles = new FillStyle[fillStyleCount];
         for (var i = 0; i < fillStyleCount; i++)
@@ -52,13 +53,14 @@ public class DefineShape : Tag,
         // TODO(pref): Support the extended count.
         var lineStyleCount = reader.GetBinaryReader().ReadByte();
         if (lineStyleCount == 0xFF)
-            throw new NotSupportedException("Extended count not yet supported.");
+            throw new MocoTodoException(TagType.DefineShape, "Extended count not yet supported.");
 
         var lineStyles = new LineStyle[lineStyleCount];
         for (var i = 0; i < lineStyleCount; i++)
             lineStyles[i] = reader.ReadLineStyle();
 
         // TODO(pref): Read shape records.
+        throw new MocoTodoException(TagType.DefineShape, "Start reading shape records.");
 
         return this;
     }

@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using Moco.Exceptions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
@@ -92,7 +93,7 @@ public class DefineBitsLossless : Tag,
         using var reader = new BinaryReader(zlibStream);
 
         if (Version != 1)
-            throw new NotSupportedException("DefineBitsLossless2 not yet supported!");
+            throw new MocoTodoException(TagType.DefineBitsLossless2, "Not yet supported!");
 
         var pixels = BitmapFormat switch
         {

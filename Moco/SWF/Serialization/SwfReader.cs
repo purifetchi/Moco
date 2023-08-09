@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.IO.Compression;
 using System.Reflection.PortableExecutable;
+using Moco.Exceptions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags;
@@ -60,7 +61,7 @@ public class SwfReader : IDisposable
         {
             SwfCompressionMode.None => stream,
             SwfCompressionMode.Zlib => new ZLibStream(stream, CompressionMode.Decompress),
-            SwfCompressionMode.Lzma => throw new NotSupportedException("Lzma compression not yet supported."),
+            SwfCompressionMode.Lzma => throw new MocoTodoException("Lzma compression not yet supported."),
             _ => throw new NotAnSwfException()
         };
     }
@@ -78,6 +79,11 @@ public class SwfReader : IDisposable
             try
             {
                 swf.AddTag(ReadTag());
+            }
+            catch (MocoTodoException e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
             }
             catch
             {
@@ -225,7 +231,7 @@ public class SwfReader : IDisposable
             type != FillStyleType.NonSmoothedRepeatingBitmap &&
             type != FillStyleType.NonSmoothedClippedBitmap)
         {
-            throw new NotSupportedException($"Fill type {type} is not yet supported.");
+            throw new MocoTodoException($"Fill type {type} is not yet supported.");
         }
 
         var bitmapId = _reader.ReadUInt16();
@@ -287,7 +293,7 @@ public class SwfReader : IDisposable
             TagType.SetBackgroundColor => new SetBackgroundColor().Parse(this, record),
             TagType.DefineBitsLossless => new DefineBitsLossless(version: 1).Parse(this, record),
             TagType.DefineBitsLossless2 => new DefineBitsLossless(version: 2).Parse(this, record),
-            //TagType.DefineShape => new DefineShape().Parse(this, record),
+            TagType.DefineShape => new DefineShape().Parse(this, record),
             _ => null!
         };
 
