@@ -98,4 +98,28 @@ internal ref struct BitReader
 
         return output;
     }
+
+    /// <summary>
+    /// Reads a fixed point 16.16 floating bit value.
+    /// </summary>
+    /// <param name="bits">The amount of bits total.</param>
+    /// <returns>The float value.</returns>
+    public float ReadFloatingBits(uint bits)
+    {
+        const int fractionalPartMask = 0xFFFF;
+        const float fractionalDivisor = 1f / (ushort.MaxValue + 1f);
+
+        if (bits < 16)
+            throw new Exception("My assumption about floating bits was wrong lol");
+
+        var value = ReadSignedBits(bits);
+
+        // Split the value into two.
+        var fractionalPart = value & (fractionalPartMask);
+        var integerPart = (value & ~fractionalPartMask) >> 16;
+
+        Console.WriteLine($"[ReadFloatingBits] This should yield {integerPart}.{fractionalPart * fractionalDivisor}");
+
+        return integerPart + (fractionalPart * fractionalDivisor);
+    }
 }
