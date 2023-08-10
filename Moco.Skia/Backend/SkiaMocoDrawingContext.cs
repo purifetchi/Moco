@@ -92,6 +92,7 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
         switch (style.Type) 
         {
             case FillStyleType.ClippedBitmap:
+            case FillStyleType.NonSmoothedClippedBitmap:
                 var bitmap = (SKBitmap)_engine!.GetCharacter(style.BitmapId);
                 _paint.Shader = SKShader.CreateBitmap(bitmap, SKShaderTileMode.Clamp, SKShaderTileMode.Clamp);
                 break;
