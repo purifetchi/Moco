@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Text;
 using Moco.Exceptions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
@@ -103,6 +104,25 @@ public class SwfReader : IDisposable
         var integerPart = (value & ~fractionalPartMask) >> 8;
 
         return integerPart + fractionalPart * fractionalDivisor;
+    }
+
+    /// <summary>
+    /// Reads a null byte terminated string.
+    /// </summary>
+    /// <returns>The string.</returns>
+    internal string ReadZeroTerminatedString()
+    {
+        var characterList = new List<byte>();
+        while (true)
+        {
+            var character = _reader.ReadByte();
+            if (character == 0)
+                break;
+
+            characterList.Add(character);
+        }
+
+        return Encoding.ASCII.GetString(characterList.ToArray());
     }
 
     /// <summary>

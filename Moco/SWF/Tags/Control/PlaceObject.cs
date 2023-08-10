@@ -112,7 +112,7 @@ public class PlaceObject : Tag,
             Ratio = binaryReader.ReadUInt16();
 
         if (Flags.HasFlag(PlaceObjectFlags.HasName))
-            throw new MocoTodoException("Read the name field of the place object tag.");
+            Name = reader.ReadZeroTerminatedString();
 
         if (Flags.HasFlag(PlaceObjectFlags.HasClipDepth))
             ClipDepth = binaryReader.ReadUInt16();
