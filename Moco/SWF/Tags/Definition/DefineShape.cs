@@ -52,25 +52,8 @@ public class DefineShape : Tag,
         CharacterId = reader.GetBinaryReader().ReadUInt16();
         ShapeBounds = reader.ReadRectangleRecord();
 
-        // Read the fill styles array.
-        // TODO(pref): Support the extended count.
-        var fillStyleCount = reader.GetBinaryReader().ReadByte();
-        if (fillStyleCount == 0xFF)
-            throw new MocoTodoException(TagType.DefineShape, "Extended count not yet supported.");
-
-        var fillStyles = new FillStyle[fillStyleCount];
-        for (var i = 0; i < fillStyleCount; i++)
-            fillStyles[i] = reader.ReadFillStyle();
-
-        // Read the line styles array.
-        // TODO(pref): Support the extended count.
-        var lineStyleCount = reader.GetBinaryReader().ReadByte();
-        if (lineStyleCount == 0xFF)
-            throw new MocoTodoException(TagType.DefineShape, "Extended count not yet supported.");
-
-        var lineStyles = new LineStyle[lineStyleCount];
-        for (var i = 0; i < lineStyleCount; i++)
-            lineStyles[i] = reader.ReadLineStyle();
+        var fillStyles = reader.ReadStyleArray(reader.ReadFillStyle);
+        var lineStyles = reader.ReadStyleArray(reader.ReadLineStyle);
 
         var br = new BitReader(reader.GetBinaryReader());
         var numFillBits = br.ReadUnsignedBits(4);

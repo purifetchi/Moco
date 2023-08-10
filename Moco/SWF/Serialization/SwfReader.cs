@@ -356,6 +356,27 @@ public class SwfReader : IDisposable
     }
 
     /// <summary>
+    /// Wrapper for reading (Fill/Line)Style arrays.
+    /// </summary>
+    /// <typeparam name="TStyle">The type we're reading.</typeparam>
+    /// <param name="reader">The method for reading.</param>
+    /// <returns>The style array.</returns>
+    internal TStyle[] ReadStyleArray<TStyle>(Func<TStyle> reader)
+    {
+        var styleCount = _reader.ReadByte();
+
+        // TODO(pref): Support the extended count.
+        if (styleCount == 0xFF)
+            throw new MocoTodoException("[ReadStyleArray] Extended count not yet supported.");
+
+        var styles = new TStyle[styleCount];
+        for (var i = 0; i < styleCount; i++)
+            styles[i] = reader();
+
+        return styles;
+    }
+
+    /// <summary>
     /// Reads the header of this swf file.
     /// </summary>
     /// <returns>The header.</returns>
