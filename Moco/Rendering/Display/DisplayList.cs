@@ -30,7 +30,10 @@ public class DisplayList
     public void Push(IDisplayListMember item)
     {
         _entries.Add(item);
-        _entries.Sort((l, r) => r.Depth.CompareTo(l.Depth));
+
+        // We need to sort the display list in the opposite direction, because of
+        // the way we draw (first->last item)
+        _entries.Sort((l, r) => l.Depth.CompareTo(r.Depth));
     }
 
     /// <summary>
