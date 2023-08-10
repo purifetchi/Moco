@@ -351,7 +351,7 @@ public class SwfReader : IDisposable
             if (isStraight)
                 return new StraightEdgeRecord().Parse(ref br);
             else
-                throw new MocoTodoException("Parse a curved edge record.");
+                return new CurvedEdgeRecord().Parse(ref br);
         }
     }
 
