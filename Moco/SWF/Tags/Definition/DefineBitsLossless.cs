@@ -1,4 +1,6 @@
-﻿using System.IO.Compression;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.IO.Compression;
 using Moco.Exceptions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
@@ -147,12 +149,16 @@ public class DefineBitsLossless : Tag,
         // padded out to 256 bytes per line.
         var padding = (4 - (BitmapWidth % 4)) % 4;
 
+        // Reading all of the bytes at once gave us an improvement of ~500%.
+        var bytes = reader.ReadBytes(BitmapHeight * (BitmapWidth + padding));
+
         var pixelIndex = 0;
+        var byteArrayIndex = 0;
         for (var y = 0; y < BitmapHeight; y++)
         {
             for (var x = 0; x < BitmapWidth; x++)
             {
-                var idx = reader.ReadByte();
+                var idx = bytes[byteArrayIndex];
 
                 var rgb = colorTable[idx];
                 data[pixelIndex] = rgb.Red;
@@ -160,10 +166,11 @@ public class DefineBitsLossless : Tag,
                 data[pixelIndex + 2] = rgb.Blue;
                 data[pixelIndex + 3] = rgb.Alpha;
                 pixelIndex += colorComponents;
+                byteArrayIndex++;
             }
 
             for (var x = 0; x < padding; x++)
-                reader.ReadByte();
+                byteArrayIndex++;
         }
 
         return data;
