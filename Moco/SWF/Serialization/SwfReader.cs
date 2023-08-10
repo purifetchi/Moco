@@ -90,6 +90,22 @@ public class SwfReader : IDisposable
     }
 
     /// <summary>
+    /// Reads a 8.8 fixed point float number.
+    /// </summary>
+    /// <returns>The fixed point number.</returns>
+    internal float Read88FixedPoint()
+    {
+        const int fractionalPartMask = 0xFF;
+        const float fractionalDivisor = 1f / (byte.MaxValue + 1f);
+        var value = _reader.ReadUInt16();
+
+        var fractionalPart = value & (fractionalPartMask);
+        var integerPart = (value & ~fractionalPartMask) >> 8;
+
+        return integerPart + fractionalPart * fractionalDivisor;
+    }
+
+    /// <summary>
     /// Reads the rectangle record.
     /// </summary>
     /// <returns>The rectangle record.</returns>
@@ -331,7 +347,7 @@ public class SwfReader : IDisposable
             Version = version,
             FileLength = fileLength,
             FrameSize = ReadRectangleRecord(),
-            FrameRate = _reader.ReadUInt16(),
+            FrameRate = Read88FixedPoint(),
             FrameCount = _reader.ReadUInt16()
         };
     }

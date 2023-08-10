@@ -25,7 +25,7 @@ internal struct SwfHeader
     /// <summary>
     /// The frame delay in 8.8 fixed number of frames per second.
     /// </summary>
-    public ushort FrameRate { get; set; }
+    public float FrameRate { get; set; }
 
     /// <summary>
     /// Total number of frames in this file.

@@ -25,6 +25,11 @@ public class Swf
     public int FrameCount { get; init; }
 
     /// <summary>
+    /// The framerate.
+    /// </summary>
+    public float FrameRate { get; init; }
+
+    /// <summary>
     /// The swf version.
     /// </summary>
     public int Version { get; init; }
@@ -43,6 +48,7 @@ public class Swf
         _tags = new List<Tag>();
 
         FrameSize = header.FrameSize;
+        FrameRate = header.FrameRate;
         FrameCount = header.FrameCount;
         Version = header.Version;
     }
