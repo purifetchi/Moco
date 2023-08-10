@@ -37,6 +37,14 @@ public class DisplayList
     }
 
     /// <summary>
+    /// Clears this display list.
+    /// </summary>
+    public void Clear()
+    {
+        _entries.Clear();
+    }
+
+    /// <summary>
     /// Removes a member at a depth.
     /// </summary>
     /// <param name="depth">The depth.</param>
