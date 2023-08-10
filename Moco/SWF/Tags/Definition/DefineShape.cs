@@ -10,13 +10,17 @@ namespace Moco.SWF.Tags.Definition;
 /// The DefineShape tag defines a shape for later use by control tags such as PlaceObject.
 /// </summary>
 public class DefineShape : Tag,
-    ICharacterDefinitionTag
+    ICharacterDefinitionTag,
+    IVersionedTag
 {
     /// <inheritdoc/>
     public override TagType Type => TagType.DefineShape;
 
     /// <inheritdoc/>
     public override int MinimumVersion => 1;
+
+    /// <inheritdoc/>
+    public int Version { get; init; }
 
     /// <summary>
     /// The id of the shape.
@@ -32,6 +36,15 @@ public class DefineShape : Tag,
     /// The shape with style.
     /// </summary>
     public ShapeWithStyle? ShapeWithStyle { get; private set; }
+
+    /// <summary>
+    /// Creates a new define shape tag with the given version.
+    /// </summary>
+    /// <param name="version">The version.</param>
+    public DefineShape(int version = 1)
+    {
+        Version = version;
+    }
 
     /// <inheritdoc/>
     internal override Tag Parse(SwfReader reader, RecordHeader header)

@@ -394,7 +394,8 @@ public class SwfReader : IDisposable
             TagType.DefineBitsLossless => new DefineBitsLossless(version: 1),
             TagType.DefineBitsLossless2 => new DefineBitsLossless(version: 2),
             TagType.PlaceObject2 => new PlaceObject(version: 2),
-            TagType.DefineShape => new DefineShape(),
+            TagType.DefineShape => new DefineShape(version: 1),
+            TagType.DefineShape2 => new DefineShape(version: 2),
             TagType.ShowFrame => new ShowFrame(),
             TagType.End => new End(),
             _ => null!
