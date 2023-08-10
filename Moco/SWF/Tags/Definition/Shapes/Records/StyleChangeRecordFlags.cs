@@ -14,7 +14,7 @@ public enum StyleChangeRecordFlags : byte
     /// <summary>
     /// Style change has new styles.
     /// </summary>
-    HasNewStyles = 1 << 3,
+    HasNewStyles = 1 << 4,
 
     /// <summary>
     /// Style change changes the line style.
