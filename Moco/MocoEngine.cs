@@ -207,9 +207,12 @@ public class MocoEngine
     /// </summary>
     /// <param name="id">The id.</param>
     /// <returns>The character.</returns>
-    public object GetCharacter(ushort id)
+    public object? GetCharacter(ushort id)
     {
-        return _objectDictionary[id];
+        if (!_objectDictionary.TryGetValue(id, out var result))
+            return null;
+
+        return result;
     }
 
     /// <summary>

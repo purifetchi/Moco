@@ -29,7 +29,14 @@ public class Object : IDisplayListMember
     /// <param name="ctx">The context.</param>
     public void Draw(DisplayListDrawingContext ctx)
     {
-        var shape = (IShape)ctx.Engine.GetCharacter(CharacterId);
+        var maybeObject = ctx.Engine.GetCharacter(CharacterId);
+
+        if (maybeObject is not IShape shape)
+        {
+            Console.WriteLine($"[Object::Draw] Missing shape at id {CharacterId} (is it an object we can't read yet?)");
+            return;
+        }
+
         ctx.Engine.Backend.PlaceShape(shape, Matrix);
     }
 }
