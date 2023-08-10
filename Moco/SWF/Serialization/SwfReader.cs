@@ -350,6 +350,7 @@ public class SwfReader : IDisposable
             TagType.SetBackgroundColor => new SetBackgroundColor(),
             TagType.DefineBitsLossless => new DefineBitsLossless(version: 1),
             TagType.DefineBitsLossless2 => new DefineBitsLossless(version: 2),
+            TagType.PlaceObject2 => new PlaceObject(version: 2),
             TagType.DefineShape => new DefineShape(),
             TagType.ShowFrame => new ShowFrame(),
             TagType.End => new End(),

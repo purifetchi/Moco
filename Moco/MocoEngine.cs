@@ -1,4 +1,5 @@
 ﻿using Moco.Rendering;
+using Moco.Rendering.Display;
 using Moco.SWF;
 using Moco.SWF.Serialization;
 using Moco.SWF.Tags.Control;
@@ -28,6 +29,11 @@ public class MocoEngine
     private Dictionary<ushort, object> _objectDictionary;
 
     /// <summary>
+    /// The frame display list.
+    /// </summary>
+    private DisplayList _displayList;
+
+    /// <summary>
     /// Constructs a new moco instance for the given backend.
     /// </summary>
     /// <param name="backend">The backend.</param>
@@ -35,6 +41,7 @@ public class MocoEngine
     {
         Backend = backend;
         _objectDictionary = new();
+        _displayList = new();
     }
 
     /// <summary>
