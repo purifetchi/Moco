@@ -35,6 +35,15 @@ public interface IMocoDrawingContext : IDisposable
     void LineToRelative(Twip x, Twip y);
 
     /// <summary>
+    /// Draws a (relative positioned) cubic bezier curve to somewhere.
+    /// </summary>
+    /// <param name="cX">The x control point.</param>
+    /// <param name="cY">The y control point.</param>
+    /// <param name="aX">The x anchor point.</param>
+    /// <param name="aY">The y anchor point.</param>
+    void CubicToRelative(Twip cX, Twip cY, Twip aX, Twip aY);
+
+    /// <summary>
     /// Flushes the points.
     /// </summary>
     void FlushPoints();

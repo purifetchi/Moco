@@ -123,6 +123,10 @@ public class MocoEngine
                                 case StraightEdgeRecord ser:
                                     ctx.LineToRelative(ser.DeltaX, ser.DeltaY);
                                     break;
+
+                                case CurvedEdgeRecord cer:
+                                    ctx.CubicToRelative(cer.ControlDeltaX, cer.ControlDeltaY, cer.AnchorDeltaX, cer.AnchorDeltaY);
+                                    break;
                             }
                         }
                         ctx.FlushPoints();

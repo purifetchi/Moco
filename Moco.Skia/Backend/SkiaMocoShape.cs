@@ -1,5 +1,6 @@
 ﻿using Moco.Rasterization;
 using Moco.SWF.Characters;
+using Moco.SWF.DataTypes;
 using SkiaSharp;
 
 namespace Moco.Skia.Backend;
@@ -23,6 +24,11 @@ public class SkiaMocoShape : IShape
     public GRBackendRenderTarget RenderTarget { get; init; }
 
     /// <summary>
+    /// The shape's bounds.
+    /// </summary>
+    public Rectangle Bounds { get; init; }
+
+    /// <summary>
     /// Constructs a new Skia backed shape.
     /// </summary>
     /// <param name="surface">The surface of the shape.</param>
@@ -30,16 +36,18 @@ public class SkiaMocoShape : IShape
     public SkiaMocoShape(
         SKSurface surface, 
         GRBackendRenderTarget rt,
+        Rectangle bounds,
         int id)
     {
         Surface = surface;
         RenderTarget = rt;
+        Bounds = bounds;
         Id = id;
     }
 
     /// <inheritdoc/>
     public IMocoDrawingContext GetRasterizationContext()
     {
-        return new SkiaMocoDrawingContext(Surface);
+        return new SkiaMocoDrawingContext(Surface, Bounds);
     }
 }

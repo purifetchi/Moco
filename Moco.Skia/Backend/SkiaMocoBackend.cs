@@ -112,7 +112,7 @@ public class SkiaMocoBackend : IMocoRendererBackend
         _rt = new GRBackendRenderTarget(
             (int)rect.XMax.LogicalPixelValue, 
             (int)rect.YMax.LogicalPixelValue, 
-            0, 8, new GRGlFramebufferInfo(0, 0x8058));
+            0, 8, new GRGlFramebufferInfo(1, 0x8058));
 
         _surface = SKSurface.Create(_context, _rt, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
         _canvas = _surface.Canvas;
@@ -140,12 +140,12 @@ public class SkiaMocoBackend : IMocoRendererBackend
     public IShape RegisterShape(int id, SWF.DataTypes.Rectangle bounds)
     {
         var renderTarget = new GRBackendRenderTarget(
-            (int)bounds.XMax.LogicalPixelValue,
-            (int)bounds.YMax.LogicalPixelValue,
+            (int)bounds.XMax.LogicalPixelValue/* - (int)bounds.XMin.LogicalPixelValue*/,
+            (int)bounds.YMax.LogicalPixelValue/* - (int)bounds.YMin.LogicalPixelValue*/,
             0, 8, new GRGlFramebufferInfo(0, 0x8058));
 
         var surface = SKSurface.Create(_context, renderTarget, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
-        return new SkiaMocoShape(surface, renderTarget, id);
+        return new SkiaMocoShape(surface, renderTarget, bounds, id);
     }
 
     /// <inheritdoc/>
