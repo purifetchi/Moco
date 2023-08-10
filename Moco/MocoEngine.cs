@@ -178,7 +178,10 @@ public class MocoEngine
 
             // TODO(pref): Support limited loops.
             if (tag is End)
+            {
+                _displayList.Clear();
                 _tagPC = 0;
+            }
         } while (tag is not ShowFrame);
 
         _sw.Restart();
