@@ -152,6 +152,11 @@ public class SkiaMocoBackend : IMocoRendererBackend
     public void PlaceShape(IShape shape, Matrix matrix)
     {
         var skiaShape = shape as SkiaMocoShape;
-        _canvas.DrawSurface(skiaShape!.Surface, new SKPoint(0, 0), new SKPaint());
+        if (matrix.HasScale || matrix.HasRotation)
+            throw new NotSupportedException("Support scaling or rotating drawn shapes.");
+        
+        _canvas.DrawSurface(
+            skiaShape!.Surface, 
+            new SKPoint(matrix.TranslateX.LogicalPixelValue, matrix.TranslateY.LogicalPixelValue));
     }
 }
