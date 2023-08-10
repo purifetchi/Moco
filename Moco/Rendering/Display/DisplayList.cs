@@ -32,4 +32,13 @@ public class DisplayList
         _entries.Add(item);
         _entries.Sort((l, r) => r.Depth.CompareTo(l.Depth));
     }
+
+    /// <summary>
+    /// Removes a member at a depth.
+    /// </summary>
+    /// <param name="depth">The depth.</param>
+    public void RemoveAtDepth(int depth)
+    {
+        _entries.Remove(_entries.First(i => i.Depth == depth));
+    }
 }

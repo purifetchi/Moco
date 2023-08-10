@@ -9,6 +9,12 @@ namespace Moco.Rasterization;
 public interface IMocoDrawingContext
 {
     /// <summary>
+    /// Sets the engine.
+    /// </summary>
+    /// <param name="engine">The engine</param>
+    void SetEngine(MocoEngine engine);
+
+    /// <summary>
     /// Sets the fill style.
     /// </summary>
     /// <param name="style">The fill style.</param>

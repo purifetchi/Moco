@@ -15,8 +15,7 @@ namespace Moco.SWF.Tags.Control;
 /// The PlaceObject tag adds a character to the display list. 
 /// </summary>
 public class PlaceObject : Tag,
-    IVersionedTag,
-    IDisplayListMember
+    IVersionedTag
 {
     /// <inheritdoc/>
     public override TagType Type => _actualType;
@@ -53,7 +52,7 @@ public class PlaceObject : Tag,
     /// <summary>
     /// Name of the character.
     /// </summary>
-    public string Name { get; private set; }
+    public string? Name { get; private set; }
 
     /// <summary>
     /// The clip depth.

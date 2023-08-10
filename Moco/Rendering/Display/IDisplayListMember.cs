@@ -9,4 +9,10 @@ public interface IDisplayListMember
     /// The z-depth of the display list item.
     /// </summary>
     int Depth { get; }
+
+    /// <summary>
+    /// Draws this object.
+    /// </summary>
+    /// <param name="ctx">The drawing context.</param>
+    void Draw(DisplayListDrawingContext ctx);
 }

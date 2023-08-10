@@ -15,6 +15,9 @@ namespace Moco.Skia.Backend;
 /// </summary>
 public class SkiaMocoBackend : IMocoRendererBackend
 {
+    /// <inheritdoc/>
+    public Action RenderFrameCallback { get; set; } = null!;
+
     /// <summary>
     /// The window.
     /// </summary>
@@ -40,6 +43,11 @@ public class SkiaMocoBackend : IMocoRendererBackend
     /// </summary>
     private SKColor _bgColor = SKColors.Black;
 
+    /// <summary>
+    /// The canvas.
+    /// </summary>
+    private SKCanvas _canvas;
+
     public SkiaMocoBackend()
     {
         // Create the Silk window that will be drawn into.
@@ -62,15 +70,16 @@ public class SkiaMocoBackend : IMocoRendererBackend
         // Create the window render target.
         _rt = new GRBackendRenderTarget(800, 600, 0, 8, new GRGlFramebufferInfo(0, 0x8058));
         _surface = SKSurface.Create(_context, _rt, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
+        _canvas = _surface.Canvas;
 
         _window.Render += d =>
         {
-            using var canvas = _surface.Canvas;
-
             _context.ResetContext();
-            canvas.Clear(_bgColor);
+            _canvas.Clear(_bgColor);
 
-            canvas.Flush();
+            RenderFrameCallback?.Invoke();
+
+            _canvas.Flush();
         };
     }
 
@@ -96,6 +105,7 @@ public class SkiaMocoBackend : IMocoRendererBackend
             (int)rect.XMax.LogicalPixelValue, 
             (int)rect.YMax.LogicalPixelValue);
 
+        _canvas.Dispose();
         _surface.Dispose();
         _rt.Dispose();
 
@@ -105,6 +115,7 @@ public class SkiaMocoBackend : IMocoRendererBackend
             0, 8, new GRGlFramebufferInfo(0, 0x8058));
 
         _surface = SKSurface.Create(_context, _rt, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
+        _canvas = _surface.Canvas;
 
         Console.WriteLine($"Setting window size: {rect.XMax.LogicalPixelValue}x{rect.YMax.LogicalPixelValue}");
     }
@@ -115,7 +126,12 @@ public class SkiaMocoBackend : IMocoRendererBackend
         var bitmap = new SKBitmap();
         var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
         var info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
-        bitmap.InstallPixels(info, handle.AddrOfPinnedObject(), info.RowBytes, delegate { handle.Free(); }, null);
+        bitmap.InstallPixels(
+            info, 
+            handle.AddrOfPinnedObject(), 
+            info.RowBytes, 
+            delegate { handle.Free(); }, 
+            null);
 
         return bitmap;
     }
@@ -129,6 +145,13 @@ public class SkiaMocoBackend : IMocoRendererBackend
             0, 8, new GRGlFramebufferInfo(0, 0x8058));
 
         var surface = SKSurface.Create(_context, renderTarget, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
-        return new SkiaMocoShape(surface, id);
+        return new SkiaMocoShape(surface, renderTarget, id);
+    }
+
+    /// <inheritdoc/>
+    public void PlaceShape(IShape shape, Matrix matrix)
+    {
+        var skiaShape = shape as SkiaMocoShape;
+        _canvas.DrawSurface(skiaShape!.Surface, new SKPoint(0, 0), new SKPaint());
     }
 }

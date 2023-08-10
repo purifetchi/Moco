@@ -11,6 +11,11 @@ namespace Moco.Rendering;
 public interface IMocoRendererBackend
 {
     /// <summary>
+    /// Called when the backend is rendering a frame.
+    /// </summary>
+    Action RenderFrameCallback { get; set; }
+
+    /// <summary>
     /// Sets the window size.
     /// </summary>
     /// <param name="rect">The window size.</param>
@@ -21,6 +26,13 @@ public interface IMocoRendererBackend
     /// </summary>
     /// <param name="color">The clear color.</param>
     void SetBackgroundClearColor(Rgba color);
+
+    /// <summary>
+    /// Places a shape.
+    /// </summary>
+    /// <param name="shape">The shape.</param>
+    /// <param name="matrix">The transform matrix of the shape.</param>
+    void PlaceShape(IShape shape, Matrix matrix);
 
     /// <summary>
     /// Registers image bytes.

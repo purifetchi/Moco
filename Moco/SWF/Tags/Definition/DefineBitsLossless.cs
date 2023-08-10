@@ -122,7 +122,7 @@ public class DefineBitsLossless : Tag,
     private unsafe byte[] ReadIndexedColorMap(BinaryReader reader)
     {
         // Read the color table.
-        var colorTable = new Rgba[BitmapColorTableSize + 1];
+        var colorTable = stackalloc Rgba[BitmapColorTableSize + 1];
         for (var i = 0; i < BitmapColorTableSize + 1; i++)
         {
             var r = reader.ReadByte();

@@ -35,15 +35,29 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     /// </summary>
     private List<SKPoint> _points;
 
+    private SKSurface _tmp;
+
+    private MocoEngine? _engine;
+
     /// <summary>
     /// Constructs a new skia moco drawing context.
     /// </summary>
     /// <param name="canvas">The canvas.</param>
-    public SkiaMocoDrawingContext(SKCanvas canvas)
+    public SkiaMocoDrawingContext(SKSurface surface, SKCanvas canvas)
     {
+        _tmp = surface;
         _canvas = canvas;
         _paint = new SKPaint();
-        _points = new();
+        _points = new()
+        {
+            new SKPoint(0, 0)
+        };
+    }
+
+    /// <inheritdoc/>
+    public void SetEngine(MocoEngine engine)
+    {
+        _engine = engine;
     }
 
     /// <inheritdoc/>
@@ -74,11 +88,12 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     public void SetFill(FillStyle style)
     {
         _paint = new SKPaint();
-        _paint.Color = SKColors.Red;
+        _paint.Style = SKPaintStyle.Fill;
         switch (style.Type) 
         {
             case FillStyleType.ClippedBitmap:
-                Console.WriteLine("[SetFill] Clipped bitmap");
+                var bitmap = (SKBitmap)_engine!.GetCharacter(style.BitmapId);
+                _paint.Shader = SKShader.CreateBitmap(bitmap, SKShaderTileMode.Clamp, SKShaderTileMode.Clamp);
                 break;
 
             default:
@@ -92,10 +107,15 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
         if (_points.Count < 1)
             return;
 
-        _canvas.DrawPoints(SKPointMode.Polygon,
-            _points.ToArray(),
-            _paint);
+        using var path = new SKPath();
+        path.AddPoly(_points.ToArray());
+        _canvas.DrawPath(path, _paint);
 
         _points.Clear();
+
+        _canvas.Flush();
+        
+        // TODO(pref): why is this required????
+        using var _ = _tmp.Snapshot();
     }
 }

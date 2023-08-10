@@ -2,6 +2,7 @@
 using Moco.Rendering.Display;
 using Moco.SWF;
 using Moco.SWF.Serialization;
+using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
 using Moco.SWF.Tags.Definition.Shapes.Records;
@@ -34,6 +35,11 @@ public class MocoEngine
     private DisplayList _displayList;
 
     /// <summary>
+    /// The tag program counter.
+    /// </summary>
+    private int _tagPC = 0;
+
+    /// <summary>
     /// Constructs a new moco instance for the given backend.
     /// </summary>
     /// <param name="backend">The backend.</param>
@@ -42,6 +48,8 @@ public class MocoEngine
         Backend = backend;
         _objectDictionary = new();
         _displayList = new();
+
+        Backend.RenderFrameCallback = DrawFrame;
     }
 
     /// <summary>
@@ -78,6 +86,7 @@ public class MocoEngine
                 case DefineShape defineShape:
                     var shape = Backend.RegisterShape(defineShape.CharacterId, defineShape.ShapeBounds);
                     var ctx = shape.GetRasterizationContext();
+                    ctx.SetEngine(this);
                     foreach (var record in defineShape.ShapeWithStyle!.ShapeRecords)
                     {
                         switch (record)
@@ -95,6 +104,7 @@ public class MocoEngine
                                 break;
                         }
                     }
+                    ctx.FlushPoints();
 
                     _objectDictionary.Add(defineShape.CharacterId, shape);
                     break;
@@ -119,6 +129,56 @@ public class MocoEngine
     }
 
     /// <summary>
+    /// Prepares a frame.
+    /// </summary>
+    private void PrepareFrame()
+    {
+        Tag tag;
+        do
+        {
+            tag = Swf!.Tags[_tagPC];
+
+            // TODO(pref): Move this code somewhere that makes sense.
+            if (tag is PlaceObject placeObject)
+            {
+                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
+                    !placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
+                {
+                    _displayList.Push(new Rendering.Display.Object
+                    {
+                        CharacterId = placeObject.CharacterId,
+                        Depth = placeObject.Depth,
+                        Matrix = placeObject.Matrix
+                    });
+                }
+
+                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
+                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
+                {
+                    _displayList.RemoveAtDepth(placeObject.Depth);
+                    _displayList.Push(new Rendering.Display.Object
+                    {
+                        CharacterId = placeObject.CharacterId,
+                        Depth = placeObject.Depth,
+                        Matrix = placeObject.Matrix
+                    });
+                }
+            }
+            _tagPC++;
+        } while (tag is not ShowFrame);
+    }
+
+    /// <summary>
+    /// Draws a single frame.
+    /// </summary>
+    private void DrawFrame()
+    {
+        var ctx = new DisplayListDrawingContext(this);
+        foreach (var item in _displayList.Entries)
+            item.Draw(ctx);
+    }
+
+    /// <summary>
     /// Gets a character from the dictionary
     /// </summary>
     /// <param name="id">The id.</param>
@@ -139,5 +199,6 @@ public class MocoEngine
 
         RegisterCharacters();
         PrepareWindow();
+        PrepareFrame();
     }
 }
