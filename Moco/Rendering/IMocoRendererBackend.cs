@@ -1,4 +1,5 @@
 ﻿using Moco.Rasterization;
+using Moco.SWF.Characters;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Tags.Definition.Shapes;
 
@@ -25,13 +26,15 @@ public interface IMocoRendererBackend
     /// Registers image bytes.
     /// </summary>
     /// <param name="id">The id to register them under.</param>
+    /// <param name="width">The width of the image.</param>
+    /// <param name="height">The height of the image.</param>
     /// <param name="data">The data.</param>
-    void RegisterImageBytes(int id, byte[] data);
+    object RegisterImageBytes(int id, int width, int height, byte[] data);
 
     /// <summary>
     /// Registers a shape.
     /// </summary>
     /// <param name="id">The shape id.</param>
     /// <returns>A drawing context to rasterize said shape.</returns>
-    IMocoDrawingContext RegisterShape(int id, Rectangle bounds);
+    IShape RegisterShape(int id, Rectangle bounds);
 }

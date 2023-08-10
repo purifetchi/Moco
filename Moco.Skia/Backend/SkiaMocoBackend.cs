@@ -1,7 +1,8 @@
-﻿using Moco.Rasterization;
+﻿using System.Runtime.InteropServices;
+using Moco.Rasterization;
 using Moco.Rendering;
+using Moco.SWF.Characters;
 using Moco.SWF.DataTypes;
-using Moco.SWF.Tags.Definition.Shapes;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Silk.NET.Windowing.Glfw;
@@ -109,13 +110,18 @@ public class SkiaMocoBackend : IMocoRendererBackend
     }
 
     /// <inheritdoc/>
-    public void RegisterImageBytes(int id, byte[] bytes)
+    public object RegisterImageBytes(int id, int width, int height, byte[] bytes)
     {
+        var bitmap = new SKBitmap();
+        var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+        var info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+        bitmap.InstallPixels(info, handle.AddrOfPinnedObject(), info.RowBytes, delegate { handle.Free(); }, null);
 
+        return bitmap;
     }
 
     /// <inheritdoc/>
-    public IMocoDrawingContext RegisterShape(int id, SWF.DataTypes.Rectangle bounds)
+    public IShape RegisterShape(int id, SWF.DataTypes.Rectangle bounds)
     {
         var renderTarget = new GRBackendRenderTarget(
             (int)bounds.XMax.LogicalPixelValue,
@@ -123,6 +129,6 @@ public class SkiaMocoBackend : IMocoRendererBackend
             0, 8, new GRGlFramebufferInfo(0, 0x8058));
 
         var surface = SKSurface.Create(_context, renderTarget, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
-        return new SkiaMocoDrawingContext(surface.Canvas);
+        return new SkiaMocoShape(surface, id);
     }
 }

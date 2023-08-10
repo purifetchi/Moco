@@ -23,12 +23,18 @@ public class MocoEngine
     public Swf? Swf { get; private set; }
 
     /// <summary>
+    /// The object dictionary.
+    /// </summary>
+    private Dictionary<ushort, object> _objectDictionary;
+
+    /// <summary>
     /// Constructs a new moco instance for the given backend.
     /// </summary>
     /// <param name="backend">The backend.</param>
     public MocoEngine(IMocoRendererBackend backend)
     {
         Backend = backend;
+        _objectDictionary = new();
     }
 
     /// <summary>
@@ -63,7 +69,8 @@ public class MocoEngine
             {
                 // TODO(pref): Move this code to a more sane location.
                 case DefineShape defineShape:
-                    var ctx = Backend.RegisterShape(defineShape.CharacterId, defineShape.ShapeBounds);
+                    var shape = Backend.RegisterShape(defineShape.CharacterId, defineShape.ShapeBounds);
+                    var ctx = shape.GetRasterizationContext();
                     foreach (var record in defineShape.ShapeWithStyle!.ShapeRecords)
                     {
                         switch (record)
@@ -81,6 +88,18 @@ public class MocoEngine
                                 break;
                         }
                     }
+
+                    _objectDictionary.Add(defineShape.CharacterId, shape);
+                    break;
+
+                case DefineBitsLossless defineBitsLossless:
+                    var imageObj = Backend.RegisterImageBytes(
+                        defineBitsLossless.CharacterId,
+                        defineBitsLossless.BitmapWidth,
+                        defineBitsLossless.BitmapHeight,
+                        defineBitsLossless.Pixmap!);
+
+                    _objectDictionary.Add(defineBitsLossless.CharacterId, imageObj);
                     break;
 
                 default:
@@ -90,6 +109,16 @@ public class MocoEngine
 
             Console.WriteLine($"Registering character of type {tag.Type} and id [{characterDefinitionTag.CharacterId}]");
         }
+    }
+
+    /// <summary>
+    /// Gets a character from the dictionary
+    /// </summary>
+    /// <param name="id">The id.</param>
+    /// <returns>The character.</returns>
+    public object GetCharacter(ushort id)
+    {
+        return _objectDictionary[id];
     }
 
     /// <summary>

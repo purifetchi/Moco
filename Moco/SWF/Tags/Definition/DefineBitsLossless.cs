@@ -139,7 +139,8 @@ public class DefineBitsLossless : Tag,
         }
 
         // Read the actual color map data.
-        var data = new byte[BitmapWidth * BitmapHeight * 3];
+        const int colorComponents = 4;
+        var data = new byte[BitmapWidth * BitmapHeight * colorComponents];
 
         // Row widths in the pixel data fields of these structures must be rounded up to the next
         // 32 - bit word boundary. For example, an 8-bit image that is 253 pixels wide must be
@@ -157,7 +158,8 @@ public class DefineBitsLossless : Tag,
                 data[pixelIndex] = rgb.Red;
                 data[pixelIndex + 1] = rgb.Green;
                 data[pixelIndex + 2] = rgb.Blue;
-                pixelIndex += 3;
+                data[pixelIndex + 3] = rgb.Alpha;
+                pixelIndex += colorComponents;
             }
 
             for (var x = 0; x < padding; x++)

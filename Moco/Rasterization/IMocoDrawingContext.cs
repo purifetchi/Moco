@@ -27,4 +27,9 @@ public interface IMocoDrawingContext
     /// <param name="x">The relative x coordinate value.</param>
     /// <param name="y">The relative y coordinate value.</param>
     void LineToRelative(Twip x, Twip y);
+
+    /// <summary>
+    /// Flushes the points.
+    /// </summary>
+    void FlushPoints();
 }
