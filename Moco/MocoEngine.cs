@@ -104,10 +104,20 @@ public class MocoEngine
                                         ctx.MoveTo(scr.MoveDeltaX, scr.MoveDeltaY);
 
                                     if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle0))
-                                        ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle0 - 1]);
+                                    {
+                                        if (scr.FillStyle0 == 0)
+                                            ctx.SetFill(null!);
+                                        else
+                                            ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle0 - 1]);
+                                    }
 
                                     if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle1))
-                                        ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle1 - 1]);
+                                    {
+                                        if (scr.FillStyle1 == 0)
+                                            ctx.SetFill(null!);
+                                        else
+                                            ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle1 - 1]);
+                                    }
                                     break;
 
                                 case StraightEdgeRecord ser:
