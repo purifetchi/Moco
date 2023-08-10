@@ -3,5 +3,5 @@ using Moco.Skia.Backend;
 
 var mocoBackend = new SkiaMocoBackend();
 var moco = new MocoEngine(mocoBackend);
-moco.LoadSwf("E:\\brkngame\\flashes\\836.swf");
+moco.LoadSwf("C:\\Users\\nano\\Downloads\\z0r-de_806(1).swf");
 mocoBackend.Run();

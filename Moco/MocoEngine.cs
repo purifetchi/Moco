@@ -1,4 +1,5 @@
-﻿using Moco.Rendering;
+﻿using System.Diagnostics;
+using Moco.Rendering;
 using Moco.Rendering.Display;
 using Moco.SWF;
 using Moco.SWF.Serialization;
@@ -40,6 +41,11 @@ public class MocoEngine
     private int _tagPC = 0;
 
     /// <summary>
+    /// The stopwatch.
+    /// </summary>
+    private Stopwatch _sw;
+
+    /// <summary>
     /// Constructs a new moco instance for the given backend.
     /// </summary>
     /// <param name="backend">The backend.</param>
@@ -48,6 +54,7 @@ public class MocoEngine
         Backend = backend;
         _objectDictionary = new();
         _displayList = new();
+        _sw = new();
 
         Backend.RenderFrameCallback = DrawFrame;
     }
@@ -165,7 +172,13 @@ public class MocoEngine
                 }
             }
             _tagPC++;
+
+            // TODO(pref): Support limited loops.
+            if (tag is End)
+                _tagPC = 0;
         } while (tag is not ShowFrame);
+
+        _sw.Restart();
     }
 
     /// <summary>
@@ -173,6 +186,9 @@ public class MocoEngine
     /// </summary>
     private void DrawFrame()
     {
+        if (_sw.ElapsedMilliseconds / 1000f >= 1 / Swf!.FrameRate)
+            PrepareFrame();
+
         var ctx = new DisplayListDrawingContext(this);
         foreach (var item in _displayList.Entries)
             item.Draw(ctx);
@@ -196,6 +212,8 @@ public class MocoEngine
     {
         using var reader = new SwfReader(filename);
         Swf = reader.ReadSwf();
+
+        _sw.Restart();
 
         RegisterCharacters();
         PrepareWindow();
