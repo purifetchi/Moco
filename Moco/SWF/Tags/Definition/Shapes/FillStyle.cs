@@ -44,4 +44,17 @@ public class FillStyle
         BitmapId = bitmapId;
         BitmapMatrix = bitmapMatrix;
     }
+
+    /// <summary>
+    /// Constructs a new fill style for the solid fill.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    /// <param name="color">The color.</param>
+    public FillStyle(
+        FillStyleType type,
+        Rgba color)
+    {
+        Type = type;
+        Color = color;
+    }
 }

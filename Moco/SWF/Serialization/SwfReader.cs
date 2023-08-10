@@ -257,18 +257,25 @@ public class SwfReader : IDisposable
     {
         var type = (FillStyleType)_reader.ReadByte();
 
-        if (type != FillStyleType.RepeatingBitmap &&
-            type != FillStyleType.ClippedBitmap &&
-            type != FillStyleType.NonSmoothedRepeatingBitmap &&
-            type != FillStyleType.NonSmoothedClippedBitmap)
+        switch (type)
         {
-            throw new MocoTodoException($"Fill type {type} is not yet supported.");
+            case FillStyleType.Solid:
+                // TODO(pref): RGBA if Shape3
+                var color = ReadRGBRecord();
+                return new FillStyle(type, color);
+
+            case FillStyleType.RepeatingBitmap:
+            case FillStyleType.ClippedBitmap:
+            case FillStyleType.NonSmoothedRepeatingBitmap:
+            case FillStyleType.NonSmoothedClippedBitmap:
+                var bitmapId = _reader.ReadUInt16();
+                var bitmapMatrix = ReadMatrixRecord();
+
+                return new FillStyle(type, bitmapId, bitmapMatrix);
+
+            default:
+                throw new MocoTodoException($"Fill type {type} is not yet supported.");
         }
-
-        var bitmapId = _reader.ReadUInt16();
-        var bitmapMatrix = ReadMatrixRecord();
-
-        return new FillStyle(type, bitmapId, bitmapMatrix);
     }
 
     /// <summary>
