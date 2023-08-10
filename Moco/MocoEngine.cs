@@ -102,6 +102,9 @@ public class MocoEngine
                                 if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasMoveTo))
                                     ctx.MoveTo(scr.MoveDeltaX, scr.MoveDeltaY);
 
+                                if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle0))
+                                    ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle0 - 1]);
+
                                 if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle1))
                                     ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle1 - 1]);
                                 break;
