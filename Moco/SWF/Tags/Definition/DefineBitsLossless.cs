@@ -60,7 +60,7 @@ public class DefineBitsLossless : Tag,
     /// <param name="version">The version.</param>
     public DefineBitsLossless(int version = 1)
     {
-        Version = 1;
+        Version = version;
     }
 
     /// <inheritdoc/>
@@ -99,9 +99,6 @@ public class DefineBitsLossless : Tag,
         using var zlibStream = new ZLibStream(ms, CompressionMode.Decompress);
         using var reader = new BinaryReader(zlibStream);
 
-        if (Version != 1)
-            throw new MocoTodoException(TagType.DefineBitsLossless2, "Not yet supported!");
-
         var pixels = BitmapFormat switch
         {
             3 => ReadIndexedColorMap(reader),
@@ -130,13 +127,14 @@ public class DefineBitsLossless : Tag,
             var r = reader.ReadByte();
             var g = reader.ReadByte();
             var b = reader.ReadByte();
+            var a = Version == 2 ? reader.ReadByte() : byte.MaxValue;
 
             colorTable[i] = new Rgba
             {
                 Red = r,
                 Green = g,
                 Blue = b,
-                Alpha = 255
+                Alpha = a
             };
         }
 
