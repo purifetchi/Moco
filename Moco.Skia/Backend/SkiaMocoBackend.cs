@@ -1,5 +1,7 @@
-﻿using Moco.Rendering;
+﻿using Moco.Rasterization;
+using Moco.Rendering;
 using Moco.SWF.DataTypes;
+using Moco.SWF.Tags.Definition.Shapes;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Silk.NET.Windowing.Glfw;
@@ -110,5 +112,17 @@ public class SkiaMocoBackend : IMocoRendererBackend
     public void RegisterImageBytes(int id, byte[] bytes)
     {
 
+    }
+
+    /// <inheritdoc/>
+    public IMocoDrawingContext RegisterShape(int id, SWF.DataTypes.Rectangle bounds)
+    {
+        var renderTarget = new GRBackendRenderTarget(
+            (int)bounds.XMax.LogicalPixelValue,
+            (int)bounds.YMax.LogicalPixelValue,
+            0, 8, new GRGlFramebufferInfo(0, 0x8058));
+
+        var surface = SKSurface.Create(_context, renderTarget, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
+        return new SkiaMocoDrawingContext(surface.Canvas);
     }
 }

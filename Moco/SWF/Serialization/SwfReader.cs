@@ -258,6 +258,10 @@ public class SwfReader : IDisposable
     internal List<IShapeRecord> ReadShapeRecordsList(ShapeRecordReadingContext ctx)
     {
         var list = new List<IShapeRecord>();
+
+        // Apparently the swf spec says that individual records are byte-boundary aligned
+        // within the list, but that's a blatant lie. Any record can peacefully invade
+        // another record's byte value and Flash Player will happily read and parse it.
         var br = new BitReader(_reader);
 
         IShapeRecord record;
