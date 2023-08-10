@@ -52,4 +52,14 @@ public class DisplayList
     {
         _entries.Remove(_entries.First(i => i.Depth == depth));
     }
+
+    /// <summary>
+    /// Gets the specified member at a depth.
+    /// </summary>
+    /// <param name="depth">The depth.</param>
+    /// <returns>Said member, or nothing.</returns>
+    public IDisplayListMember? GetAtDepth(int depth)
+    {
+        return _entries.FirstOrDefault(i => i.Depth == depth);
+    }
 }

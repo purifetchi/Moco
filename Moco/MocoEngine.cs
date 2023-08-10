@@ -189,6 +189,14 @@ public class MocoEngine
                         Matrix = placeObject.Matrix
                     });
                 }
+
+                if (!placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
+                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
+                {
+                    var maybeShape = _displayList.GetAtDepth(placeObject.Depth);
+                    if (maybeShape is Rendering.Display.Object shape)
+                        shape.Matrix = placeObject.Matrix;
+                }
             }
             _tagPC++;
 
