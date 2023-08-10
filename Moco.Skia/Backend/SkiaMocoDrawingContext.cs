@@ -96,8 +96,19 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     {
         _paint = new SKPaint();
         _paint.Style = SKPaintStyle.Fill;
+        if (style is null)
+            return;
+
         switch (style.Type) 
         {
+            case FillStyleType.Solid:
+                _paint.Color = new SKColor(
+                    style.Color.Red, 
+                    style.Color.Green, 
+                    style.Color.Blue, 
+                    style.Color.Alpha);
+                break;
+
             case FillStyleType.ClippedBitmap:
             case FillStyleType.NonSmoothedClippedBitmap:
                 var bitmap = (SKBitmap)_engine!.GetCharacter(style.BitmapId);
