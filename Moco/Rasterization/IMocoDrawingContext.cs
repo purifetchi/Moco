@@ -6,7 +6,7 @@ namespace Moco.Rasterization;
 /// <summary>
 /// A context exposing the drawing while rasterizing shapes.
 /// </summary>
-public interface IMocoDrawingContext
+public interface IMocoDrawingContext : IDisposable
 {
     /// <summary>
     /// Sets the engine.

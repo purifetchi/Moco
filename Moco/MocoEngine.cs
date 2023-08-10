@@ -91,32 +91,34 @@ public class MocoEngine
             {
                 // TODO(pref): Move this code to a more sane location.
                 case DefineShape defineShape:
-                    var shape = Backend.RegisterShape(defineShape.CharacterId, defineShape.ShapeBounds);
-                    var ctx = shape.GetRasterizationContext();
-                    ctx.SetEngine(this);
-                    foreach (var record in defineShape.ShapeWithStyle!.ShapeRecords)
                     {
-                        switch (record)
+                        var shape = Backend.RegisterShape(defineShape.CharacterId, defineShape.ShapeBounds);
+                        using var ctx = shape.GetRasterizationContext();
+                        ctx.SetEngine(this);
+                        foreach (var record in defineShape.ShapeWithStyle!.ShapeRecords)
                         {
-                            case StyleChangeRecord scr:
-                                if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasMoveTo))
-                                    ctx.MoveTo(scr.MoveDeltaX, scr.MoveDeltaY);
+                            switch (record)
+                            {
+                                case StyleChangeRecord scr:
+                                    if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasMoveTo))
+                                        ctx.MoveTo(scr.MoveDeltaX, scr.MoveDeltaY);
 
-                                if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle0))
-                                    ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle0 - 1]);
+                                    if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle0))
+                                        ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle0 - 1]);
 
-                                if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle1))
-                                    ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle1 - 1]);
-                                break;
+                                    if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle1))
+                                        ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle1 - 1]);
+                                    break;
 
-                            case StraightEdgeRecord ser:
-                                ctx.LineToRelative(ser.DeltaX, ser.DeltaY);
-                                break;
+                                case StraightEdgeRecord ser:
+                                    ctx.LineToRelative(ser.DeltaX, ser.DeltaY);
+                                    break;
+                            }
                         }
-                    }
-                    ctx.FlushPoints();
+                        ctx.FlushPoints();
 
-                    _objectDictionary.Add(defineShape.CharacterId, shape);
+                        _objectDictionary.Add(defineShape.CharacterId, shape);
+                    }
                     break;
 
                 case DefineBitsLossless defineBitsLossless:

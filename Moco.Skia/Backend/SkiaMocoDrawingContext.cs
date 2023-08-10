@@ -16,6 +16,11 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     private SKCanvas _canvas;
 
     /// <summary>
+    /// The surface we're drawing on.
+    /// </summary>
+    private SKSurface _surface;
+
+    /// <summary>
     /// The paint.
     /// </summary>
     private SKPaint _paint;
@@ -35,19 +40,21 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     /// </summary>
     private List<SKPoint> _points;
 
-    private SKSurface _tmp;
-
+    /// <summary>
+    /// The Moco engine.
+    /// </summary>
     private MocoEngine? _engine;
 
     /// <summary>
     /// Constructs a new skia moco drawing context.
     /// </summary>
     /// <param name="canvas">The canvas.</param>
-    public SkiaMocoDrawingContext(SKSurface surface, SKCanvas canvas)
+    public SkiaMocoDrawingContext(SKSurface surface)
     {
-        _tmp = surface;
-        _canvas = canvas;
+        _surface = surface;
+        _canvas = surface.Canvas;
         _paint = new SKPaint();
+
         _points = new()
         {
             new SKPoint(0, 0)
@@ -111,12 +118,20 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
         using var path = new SKPath();
         path.AddPoly(_points.ToArray());
         _canvas.DrawPath(path, _paint);
+        _canvas.Flush();
 
         _points.Clear();
-
-        _canvas.Flush();
         
-        // TODO(pref): why is this required????
-        using var _ = _tmp.Snapshot();
+        // TODO(pref): I've tried various things but the canvas will not draw
+        //             at all without this thing.
+        using var _ = _surface.Snapshot();
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _paint.Dispose();
+        _canvas.Dispose();
     }
 }

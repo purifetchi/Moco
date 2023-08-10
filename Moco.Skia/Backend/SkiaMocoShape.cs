@@ -40,6 +40,6 @@ public class SkiaMocoShape : IShape
     /// <inheritdoc/>
     public IMocoDrawingContext GetRasterizationContext()
     {
-        return new SkiaMocoDrawingContext(Surface, Surface.Canvas);
+        return new SkiaMocoDrawingContext(Surface);
     }
 }
