@@ -1,4 +1,5 @@
-﻿using Moco.Rasterization;
+﻿using System.ComponentModel.DataAnnotations;
+using Moco.Rasterization;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Tags.Definition.Shapes;
 using SkiaSharp;
@@ -51,6 +52,11 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     private Rectangle _bounds;
 
     /// <summary>
+    /// The last path.
+    /// </summary>
+    private SKPath? _lastPath;
+
+    /// <summary>
     /// Constructs a new skia moco drawing context.
     /// </summary>
     /// <param name="canvas">The canvas.</param>
@@ -63,7 +69,7 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
         _canvas = surface.Canvas;
         _paint = new SKPaint();
         _canvas.Clear(SKColors.Transparent);
-        
+
         _points = new()
         {
             new SKPoint(0, 0)
@@ -150,8 +156,12 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
         _paint = new SKPaint();
         _paint.Style = SKPaintStyle.Fill;
         _paint.IsAntialias = true;
+
         if (style is null)
+        {
+            _paint.Color = SKColors.Transparent;
             return;
+        }
 
         switch (style.Type) 
         {
@@ -180,13 +190,29 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
         if (_points.Count < 1)
             return;
 
-        //_canvas.DrawPoints(SKPointMode.Polygon, _points.ToArray(), _paint);
-
-        using var path = new SKPath();
-        path.AddPoly(_points.ToArray(), false);
-
+        var path = new SKPath();
+        path.AddPoly(_points.ToArray(), true);
         _canvas.DrawPath(path, _paint);
+
+        if (_lastPath != null)
+        {
+            using var intersect = path.Op(_lastPath, SKPathOp.Intersect);
+
+            // TODO(pref): This should be filled with the FillStyle1 fill style.
+            using (new SKAutoCanvasRestore(_canvas))
+            {
+                _canvas.ClipPath(intersect, antialias: true);
+                _canvas.DrawColor(SKColors.Transparent);
+            }
+        }
+
         _canvas.Flush();
+
+        // XOR the paths together, basically creating a hole where the old and the new path
+        // intersect.
+        _lastPath = _lastPath == null ? 
+            path : 
+            _lastPath!.Op(path, SKPathOp.Xor);
 
         _points.Clear();
     }
