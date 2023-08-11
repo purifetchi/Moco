@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Moco.Exceptions;
 using Moco.Rendering;
 using Moco.Rendering.Display;
 using Moco.SWF;
@@ -198,6 +199,14 @@ public class MocoEngine
                         shape.Matrix = placeObject.Matrix;
                 }
             }
+            else if (tag is RemoveObject removeObject)
+            {
+                if (removeObject.CharacterId.HasValue)
+                    throw new MocoTodoException(TagType.RemoveObject, "Care about the character id when removing.");
+
+                _displayList.RemoveAtDepth(removeObject.Depth);
+            }
+
             _tagPC++;
 
             // TODO(pref): Support limited loops.
