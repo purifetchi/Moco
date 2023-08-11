@@ -342,7 +342,7 @@ public class SwfReader : IDisposable
                 return new EndShapeRecord();
 
             return new StyleChangeRecord(flags)
-                .Parse(ref br, ctx);
+                .Parse(ref br, this, ctx);
         }
         else
         {

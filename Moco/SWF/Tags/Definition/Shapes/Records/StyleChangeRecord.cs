@@ -1,5 +1,6 @@
 ﻿using Moco.Exceptions;
 using Moco.SWF.DataTypes;
+using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
 
 namespace Moco.SWF.Tags.Definition.Shapes.Records;
@@ -64,12 +65,12 @@ public class StyleChangeRecord : IShapeRecord
     /// <summary>
     /// Number of fill index bits for new styles
     /// </summary>
-    public int NumFillBits { get; private set; }
+    public uint NumFillBits { get; private set; }
 
     /// <summary>
     /// Number of line index bits for new styles
     /// </summary>
-    public int NumLineBits { get; private set; }
+    public uint NumLineBits { get; private set; }
 
     /// <summary>
     /// Constructs a new style change record from the given flags.
@@ -88,6 +89,7 @@ public class StyleChangeRecord : IShapeRecord
     /// <returns>The parsed style change record.</returns>
     internal StyleChangeRecord Parse(
         ref BitReader br,
+        SwfReader swfReader,
         ShapeRecordReadingContext ctx)
     {
         if (Flags.HasFlag(StyleChangeRecordFlags.HasMoveTo))
@@ -109,7 +111,15 @@ public class StyleChangeRecord : IShapeRecord
             LineStyle = br.ReadUnsignedBits(ctx.NumLineBits);
 
         if (Flags.HasFlag(StyleChangeRecordFlags.HasNewStyles))
-            throw new MocoTodoException("Support HasNewStyles.");
+        {
+            FillStyles = swfReader.ReadStyleArray(swfReader.ReadFillStyle);
+            LineStyles = swfReader.ReadStyleArray(swfReader.ReadLineStyle);
+
+            // hackity hack
+            br = new BitReader(swfReader.GetBinaryReader());
+            NumFillBits = br.ReadUnsignedBits(4);
+            NumLineBits = br.ReadUnsignedBits(4);
+        }
 
         return this;
     }
