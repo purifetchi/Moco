@@ -90,7 +90,7 @@ public class StyleChangeRecord : IShapeRecord
     internal StyleChangeRecord Parse(
         ref BitReader br,
         SwfReader swfReader,
-        ShapeRecordReadingContext ctx)
+        ref ShapeRecordReadingContext ctx)
     {
         if (Flags.HasFlag(StyleChangeRecordFlags.HasMoveTo))
         {
@@ -119,6 +119,8 @@ public class StyleChangeRecord : IShapeRecord
             br = new BitReader(swfReader.GetBinaryReader());
             NumFillBits = br.ReadUnsignedBits(4);
             NumLineBits = br.ReadUnsignedBits(4);
+
+            ctx = new ShapeRecordReadingContext(NumFillBits, NumLineBits);
         }
 
         return this;

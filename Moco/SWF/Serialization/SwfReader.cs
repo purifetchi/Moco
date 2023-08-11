@@ -310,7 +310,7 @@ public class SwfReader : IDisposable
         IShapeRecord record;
         do
         {
-            record = ReadShapeRecord(ref br, ctx);
+            record = ReadShapeRecord(ref br, ref ctx);
             list.Add(record);
         } while (record is not EndShapeRecord);
 
@@ -325,7 +325,7 @@ public class SwfReader : IDisposable
     /// <returns>The shape record.</returns>
     internal IShapeRecord ReadShapeRecord(
         ref BitReader br,
-        ShapeRecordReadingContext ctx)
+        ref ShapeRecordReadingContext ctx)
     {
         var type = (ShapeRecordType)br.ReadBit();
         Console.WriteLine($"[ReadShapeRecord] Beginning to read record of type {type}");
@@ -342,7 +342,7 @@ public class SwfReader : IDisposable
                 return new EndShapeRecord();
 
             return new StyleChangeRecord(flags)
-                .Parse(ref br, this, ctx);
+                .Parse(ref br, this, ref ctx);
         }
         else
         {
