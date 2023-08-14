@@ -126,15 +126,15 @@ public class Timeline
     /// </summary>
     public void AdvanceFrame()
     {
-        FrameIndex++;
+        var newIndex = FrameIndex + 1;
         
-        if (FrameIndex == _frames.Count)
+        if (newIndex == _frames.Count)
         {
             // Restart if we still can
             if (_loops < LoopCount)
             {
                 _loops++;
-                FrameIndex = 0;
+                newIndex = 0;
             }
             else
             {
@@ -143,11 +143,35 @@ public class Timeline
             }
         }
 
-        var frame = Frames[FrameIndex];
-        frame.ExecuteTags(this);
+        SetFrame(newIndex);
+    }
 
-        // Actions are supposed to be run right after the frame is ready
-        frame.RunActions(new SWF.Actions.ActionExecutionContext(this));
+    /// <summary>
+    /// Sets the frame by its index.
+    /// </summary>
+    /// <param name="index">The frame index.</param>
+    public void SetFrame(int index)
+    {
+        if (index >= Frames.Count || index < 0)
+            throw new ArgumentOutOfRangeException(nameof(index), "Frame index isn't in the bounds [0; count]");
+
+        // If the index isn't the next frame, we need to simulate up until that point.
+        // TODO(pref): We can optimize it if the index is after the frame index, we
+        //             only need to simulate the difference in frames.
+        if (index != FrameIndex + 1)
+        {
+            for (var i = 0; i < index; i++)
+            {
+                var frame = Frames[i];
+                frame.ExecuteTags(this);
+            }
+        }
+
+        FrameIndex = index;
+
+        var actualFrame = Frames[index];
+        actualFrame.ExecuteTags(this);
+        actualFrame.RunActions(new SWF.Actions.ActionExecutionContext(this));
 
         _sw.Restart();
     }
