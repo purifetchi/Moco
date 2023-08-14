@@ -30,6 +30,9 @@ public class Timeline
         get => _sw.IsRunning;
         set
         {
+            if (_sw.IsRunning == value)
+                return;
+
             if (value)
                 _sw.Start();
             else

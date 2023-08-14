@@ -1,8 +1,8 @@
 ﻿using System.IO.Compression;
-using System.Net.Http.Headers;
 using System.Text;
 using Moco.Exceptions;
 using Moco.SWF.Actions;
+using Moco.SWF.Actions.SWF3;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags;
@@ -441,7 +441,7 @@ public class SwfReader : IDisposable
     /// Reads an action.
     /// </summary>
     /// <returns>The action.</returns>
-    public Actions.SwfAction? ReadAction()
+    public SwfAction? ReadAction()
     {
         const byte hasLengthBoundary = 0x80;
 
@@ -457,6 +457,10 @@ public class SwfReader : IDisposable
 
         return type switch
         {
+            ActionType.Play => new PlayAction().Parse(this),
+            ActionType.Stop => new StopAction().Parse(this),
+            ActionType.WaitForFrame => new WaitForFrameAction().Parse(this),
+            ActionType.GotoFrame => new GoToFrameAction().Parse(this),
             _ => new DummyAction(type, length).Parse(this)
         };
     }

@@ -1,4 +1,5 @@
-﻿using Moco.Exceptions;
+﻿using System.Reflection.Metadata;
+using Moco.Exceptions;
 using Moco.Rendering.Display;
 using Moco.SWF.Actions;
 using Moco.SWF.Tags;
@@ -121,6 +122,9 @@ public class Frame
             return;
 
         for (ctx.PC = 0; ctx.PC < Actions.Count; ctx.PC++)
+        {
+            Console.WriteLine($"[Frame::RunActions] Executing action {Actions[ctx.PC].Type} at PC {ctx.PC}");
             Actions[ctx.PC].Execute(ctx);
+        }
     }
 }
