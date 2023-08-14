@@ -1,13 +1,10 @@
-﻿using System.Diagnostics;
-using Moco.Exceptions;
-using Moco.Rasterization;
+﻿using Moco.Rasterization;
 using Moco.Rendering;
-using Moco.Rendering.Display;
 using Moco.SWF;
 using Moco.SWF.Serialization;
-using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
+using Moco.Timelining;
 
 namespace Moco;
 
@@ -32,19 +29,9 @@ public class MocoEngine
     private Dictionary<ushort, object> _objectDictionary;
 
     /// <summary>
-    /// The frame display list.
+    /// The main timeline.
     /// </summary>
-    private DisplayList _displayList;
-
-    /// <summary>
-    /// The tag program counter.
-    /// </summary>
-    private int _tagPC = 0;
-
-    /// <summary>
-    /// The stopwatch.
-    /// </summary>
-    private Stopwatch _sw;
+    private Timeline? _timeline;
 
     /// <summary>
     /// Constructs a new moco instance for the given backend.
@@ -54,10 +41,8 @@ public class MocoEngine
     {
         Backend = backend;
         _objectDictionary = new();
-        _displayList = new();
-        _sw = new();
 
-        Backend.RenderFrameCallback = DrawFrame;
+        Backend.RenderFrameCallback = Tick;
     }
 
     /// <summary>
@@ -125,81 +110,12 @@ public class MocoEngine
     }
 
     /// <summary>
-    /// Prepares a frame.
+    /// Runs the logic and then draws.
     /// </summary>
-    private void PrepareFrame()
+    private void Tick()
     {
-        Tag tag;
-        do
-        {
-            tag = Swf!.Tags[_tagPC];
-
-            // TODO(pref): Move this code somewhere that makes sense.
-            if (tag is PlaceObject placeObject)
-            {
-                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    !placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    _displayList.Push(new Rendering.Display.Object
-                    {
-                        CharacterId = placeObject.CharacterId,
-                        Depth = placeObject.Depth,
-                        Matrix = placeObject.Matrix
-                    });
-                }
-
-                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    _displayList.RemoveAtDepth(placeObject.Depth);
-                    _displayList.Push(new Rendering.Display.Object
-                    {
-                        CharacterId = placeObject.CharacterId,
-                        Depth = placeObject.Depth,
-                        Matrix = placeObject.Matrix
-                    });
-                }
-
-                if (!placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    var maybeShape = _displayList.GetAtDepth(placeObject.Depth);
-                    if (maybeShape is Rendering.Display.Object shape)
-                        shape.Matrix = placeObject.Matrix;
-                }
-            }
-            else if (tag is RemoveObject removeObject)
-            {
-                if (removeObject.CharacterId.HasValue)
-                    throw new MocoTodoException(TagType.RemoveObject, "Care about the character id when removing.");
-
-                _displayList.RemoveAtDepth(removeObject.Depth);
-            }
-
-            _tagPC++;
-
-            // TODO(pref): Support limited loops.
-            if (tag is End)
-            {
-                _displayList.Clear();
-                _tagPC = 0;
-            }
-        } while (tag is not ShowFrame);
-
-        _sw.Restart();
-    }
-
-    /// <summary>
-    /// Draws a single frame.
-    /// </summary>
-    private void DrawFrame()
-    {
-        if (_sw.ElapsedMilliseconds / 1000f >= 1 / Swf!.FrameRate)
-            PrepareFrame();
-
-        var ctx = new DisplayListDrawingContext(this);
-        foreach (var item in _displayList.Entries)
-            item.Draw(ctx);
+        _timeline?.Tick();
+        _timeline?.Draw(new DisplayListDrawingContext(this));
     }
 
     /// <summary>
@@ -223,11 +139,12 @@ public class MocoEngine
     {
         using var reader = new SwfReader(filename);
         Swf = reader.ReadSwf();
-
-        _sw.Restart();
+        _timeline = new(
+            Swf.Tags,
+            Swf.FrameRate,
+            int.MaxValue);
 
         RegisterCharacters();
         PrepareWindow();
-        PrepareFrame();
     }
 }

@@ -7,7 +7,8 @@ namespace Moco.SWF.Tags.Control;
 /// The RemoveObject tag removes the character at the specified depth from the display list.
 /// </summary>
 public class RemoveObject : Tag,
-    IVersionedTag
+    IVersionedTag,
+    IControlTag
 {
     /// <inheritdoc/>
     public override TagType Type => _actualTag;

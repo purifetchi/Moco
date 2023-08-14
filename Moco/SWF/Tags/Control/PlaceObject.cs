@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moco.Exceptions;
-using Moco.Rendering.Display;
+﻿using Moco.Exceptions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
@@ -15,7 +9,8 @@ namespace Moco.SWF.Tags.Control;
 /// The PlaceObject tag adds a character to the display list. 
 /// </summary>
 public class PlaceObject : Tag,
-    IVersionedTag
+    IVersionedTag,
+    IControlTag
 {
     /// <inheritdoc/>
     public override TagType Type => _actualType;

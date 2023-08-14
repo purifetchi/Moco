@@ -3,7 +3,7 @@
 /// <summary>
 /// A drawing context for when we're drawing display list objects.
 /// </summary>
-public class DisplayListDrawingContext
+public readonly struct DisplayListDrawingContext
 {
     /// <summary>
     /// The Moco engine.
