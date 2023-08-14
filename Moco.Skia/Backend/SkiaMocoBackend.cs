@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using Moco.Rasterization;
 using Moco.Rendering;
 using Moco.SWF.Characters;
 using Moco.SWF.DataTypes;
@@ -139,13 +138,11 @@ public class SkiaMocoBackend : IMocoRendererBackend
     /// <inheritdoc/>
     public IShape RegisterShape(int id, SWF.DataTypes.Rectangle bounds)
     {
-        var renderTarget = new GRBackendRenderTarget(
-            (int)bounds.XMax.LogicalPixelValue/* - (int)bounds.XMin.LogicalPixelValue*/,
-            (int)bounds.YMax.LogicalPixelValue/* - (int)bounds.YMin.LogicalPixelValue*/,
-            0, 8, new GRGlFramebufferInfo(0, 0x8058));
+        var bitmap = new SKBitmap(
+            (int)(bounds.XMax.LogicalPixelValue - bounds.XMin.LogicalPixelValue),
+            (int)(bounds.YMax.LogicalPixelValue - bounds.YMin.LogicalPixelValue));
 
-        var surface = SKSurface.Create(_context, renderTarget, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
-        return new SkiaMocoShape(surface, renderTarget, bounds, id);
+        return new SkiaMocoShape(bitmap, null!, bounds, id);
     }
 
     /// <inheritdoc/>
@@ -154,9 +151,11 @@ public class SkiaMocoBackend : IMocoRendererBackend
         var skiaShape = shape as SkiaMocoShape;
         if (matrix.HasScale || matrix.HasRotation)
             throw new NotSupportedException("Support scaling or rotating drawn shapes.");
-        
-        _canvas.DrawSurface(
-            skiaShape!.Surface, 
-            new SKPoint(matrix.TranslateX.LogicalPixelValue, matrix.TranslateY.LogicalPixelValue));
+
+        _canvas.DrawBitmap(
+            skiaShape!.Surface,
+            new SKPoint(
+                matrix.TranslateX.LogicalPixelValue + skiaShape.Bounds.XMin.LogicalPixelValue, 
+                matrix.TranslateY.LogicalPixelValue + skiaShape.Bounds.YMin.LogicalPixelValue));
     }
 }

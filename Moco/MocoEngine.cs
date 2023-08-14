@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Moco.Exceptions;
+using Moco.Rasterization;
 using Moco.Rendering;
 using Moco.Rendering.Display;
 using Moco.SWF;
@@ -7,7 +8,6 @@ using Moco.SWF.Serialization;
 using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
-using Moco.SWF.Tags.Definition.Shapes.Records;
 
 namespace Moco;
 
@@ -96,41 +96,10 @@ public class MocoEngine
                         var shape = Backend.RegisterShape(defineShape.CharacterId, defineShape.ShapeBounds);
                         using var ctx = shape.GetRasterizationContext();
                         ctx.SetEngine(this);
-                        foreach (var record in defineShape.ShapeWithStyle!.ShapeRecords)
-                        {
-                            switch (record)
-                            {
-                                case StyleChangeRecord scr:
-                                    if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasMoveTo))
-                                        ctx.MoveTo(scr.MoveDeltaX, scr.MoveDeltaY);
 
-                                    if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle0))
-                                    {
-                                        if (scr.FillStyle0 == 0)
-                                            ctx.SetFill(null!);
-                                        else
-                                            ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle0 - 1]);
-                                    }
-
-                                    if (scr.Flags.HasFlag(StyleChangeRecordFlags.HasFillStyle1))
-                                    {
-                                        if (scr.FillStyle1 == 0)
-                                            ctx.SetFill(null!);
-                                        else
-                                            ctx.SetFill(defineShape.ShapeWithStyle!.FillStyles[scr.FillStyle1 - 1]);
-                                    }
-                                    break;
-
-                                case StraightEdgeRecord ser:
-                                    ctx.LineToRelative(ser.DeltaX, ser.DeltaY);
-                                    break;
-
-                                case CurvedEdgeRecord cer:
-                                    ctx.CubicToRelative(cer.ControlDeltaX, cer.ControlDeltaY, cer.AnchorDeltaX, cer.AnchorDeltaY);
-                                    break;
-                            }
-                        }
-                        ctx.FlushPoints();
+                        new PathBuilder(defineShape.ShapeWithStyle!)
+                            .CreateEdgeMaps()
+                            .Rasterize(ctx);
 
                         _objectDictionary.Add(defineShape.CharacterId, shape);
                     }

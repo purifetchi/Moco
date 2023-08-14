@@ -118,9 +118,6 @@ internal ref struct BitReader
         const int fractionalPartMask = 0xFFFF;
         const float fractionalDivisor = 1f / (ushort.MaxValue + 1f);
 
-        if (bits < 16)
-            throw new Exception("My assumption about floating bits was wrong lol");
-
         var value = ReadSignedBits(bits);
         Console.WriteLine($"[ReadFloatingBits] Value => {value}");
 

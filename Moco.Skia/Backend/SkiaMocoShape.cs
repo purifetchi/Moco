@@ -16,7 +16,7 @@ public class SkiaMocoShape : IShape
     /// <summary>
     /// The backing surface.
     /// </summary>
-    public SKSurface Surface { get; init; }
+    public SKBitmap Surface { get; init; }
 
     /// <summary>
     /// The render target.
@@ -34,7 +34,7 @@ public class SkiaMocoShape : IShape
     /// <param name="surface">The surface of the shape.</param>
     /// <param name="id">The id of the shape.</param>
     public SkiaMocoShape(
-        SKSurface surface, 
+        SKBitmap surface, 
         GRBackendRenderTarget rt,
         Rectangle bounds,
         int id)

@@ -328,7 +328,7 @@ public class SwfReader : IDisposable
         ref ShapeRecordReadingContext ctx)
     {
         var type = (ShapeRecordType)br.ReadBit();
-        Console.WriteLine($"[ReadShapeRecord] Beginning to read record of type {type}");
+        //Console.WriteLine($"[ReadShapeRecord] Beginning to read record of type {type}");
 
         if (type == ShapeRecordType.NonEdgeRecord)
         {

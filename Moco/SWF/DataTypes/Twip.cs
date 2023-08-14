@@ -33,4 +33,15 @@ public readonly struct Twip
     {
         Value = value;
     }
+
+    /// <summary>
+    /// Adds two twips together.
+    /// </summary>
+    /// <param name="a">The 1st twip.</param>
+    /// <param name="b">The 2nd twip.</param>
+    /// <returns>The resulting twip.</returns>
+    public static Twip operator+(Twip a, Twip b)
+    {
+        return new Twip(a.Value + b.Value);
+    }
 }

@@ -21,27 +21,29 @@ public interface IMocoDrawingContext : IDisposable
     void SetFill(FillStyle style);
 
     /// <summary>
+    /// Sets the stroke style.
+    /// </summary>
+    /// <param name="style">The stroke style.</param>
+    void SetStroke(LineStyle style);
+
+    /// <summary>
     /// Moves the pen to a position.
     /// </summary>
-    /// <param name="x">The x coordinate.</param>
-    /// <param name="y">The y coordinate.</param>
-    void MoveTo(Twip x, Twip y);
+    /// <param name="point">The point.</param>
+    void MoveTo(Point point);
 
     /// <summary>
-    /// Draws a (relative positioned) line to somewhere.
+    /// Draws a line to somewhere.
     /// </summary>
-    /// <param name="x">The relative x coordinate value.</param>
-    /// <param name="y">The relative y coordinate value.</param>
-    void LineToRelative(Twip x, Twip y);
+    /// <param name="point">The point to end at.</param>
+    void LineTo(Point point);
 
     /// <summary>
-    /// Draws a (relative positioned) cubic bezier curve to somewhere.
+    /// Draws a cubic bezier curve to somewhere.
     /// </summary>
-    /// <param name="cX">The x control point.</param>
-    /// <param name="cY">The y control point.</param>
-    /// <param name="aX">The x anchor point.</param>
-    /// <param name="aY">The y anchor point.</param>
-    void CubicToRelative(Twip cX, Twip cY, Twip aX, Twip aY);
+    /// <param name="control">The midway control point.</param>
+    /// <param name="anchor">The final anchor point.</param>
+    void CubicTo(Point control, Point anchor);
 
     /// <summary>
     /// Flushes the points.
