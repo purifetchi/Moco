@@ -99,6 +99,14 @@ public class Timeline
         {
             if (tag is IControlTag controlTag)
             {
+                if (tag is DoAction doAction)
+                {
+                    foreach (var action in doAction.Actions!)
+                        frame.AddAction(action);
+
+                    continue;
+                }
+
                 frame.AddTag(controlTag);
                 continue;
             }

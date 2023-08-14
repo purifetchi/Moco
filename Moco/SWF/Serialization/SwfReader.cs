@@ -1,6 +1,8 @@
 ﻿using System.IO.Compression;
+using System.Net.Http.Headers;
 using System.Text;
 using Moco.Exceptions;
+using Moco.SWF.Actions;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization.Internal;
 using Moco.SWF.Tags;
@@ -420,6 +422,7 @@ public class SwfReader : IDisposable
             TagType.DefineShape => new DefineShape(version: 1),
             TagType.DefineShape2 => new DefineShape(version: 2),
             TagType.ShowFrame => new ShowFrame(),
+            TagType.DoAction => new DoAction(),
             TagType.End => new End(),
             _ => null!
         };
@@ -432,6 +435,30 @@ public class SwfReader : IDisposable
         }
 
         return tag!.Parse(this, record);
+    }
+
+    /// <summary>
+    /// Reads an action.
+    /// </summary>
+    /// <returns>The action.</returns>
+    public Actions.SwfAction? ReadAction()
+    {
+        const byte hasLengthBoundary = 0x80;
+
+        // If the type is 0, we can exit. That's the end marker.
+        var type = (ActionType)_reader.ReadByte();
+        if (type == 0x00)
+            return null;
+
+        // If the tag is above 0x80, we need to read its length.
+        var length = 0;
+        if ((byte)type >= hasLengthBoundary)
+            length = _reader.ReadUInt16();
+
+        return type switch
+        {
+            _ => new DummyAction(type, length).Parse(this)
+        };
     }
 
     /// <summary>

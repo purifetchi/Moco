@@ -1,4 +1,5 @@
-﻿using Moco.SWF.Tags;
+﻿using Moco.SWF.Actions;
+using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 
 namespace Moco.Timelining;
@@ -14,9 +15,19 @@ public class Frame
     public IReadOnlyList<Tag> EffectorTags => _frameTags;
 
     /// <summary>
+    /// The list of actions to perform.
+    /// </summary>
+    public IReadOnlyList<SwfAction> Actions => _actions;
+
+    /// <summary>
     /// The frame tags.
     /// </summary>
     private readonly List<Tag> _frameTags;
+
+    /// <summary>
+    /// The actions.
+    /// </summary>
+    private readonly List<SwfAction> _actions;
 
     /// <summary>
     /// Constructs a blank frame.
@@ -24,6 +35,7 @@ public class Frame
     public Frame()
     {
         _frameTags = new();
+        _actions = new();
     }
 
     /// <summary>
@@ -34,5 +46,14 @@ public class Frame
         where TTag : IControlTag
     {
         _frameTags.Add((tag as Tag)!);
+    }
+
+    /// <summary>
+    /// Adds an action.
+    /// </summary>
+    /// <param name="action">The action.</param>
+    public void AddAction(SwfAction action)
+    {
+        _actions.Add(action);
     }
 }
