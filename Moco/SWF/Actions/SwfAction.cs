@@ -15,7 +15,7 @@ public abstract class SwfAction
     /// <summary>
     /// Executes the action.
     /// </summary>
-    public abstract void Execute();
+    public abstract void Execute(ActionExecutionContext ctx);
 
     /// <summary>
     /// Parses this action.

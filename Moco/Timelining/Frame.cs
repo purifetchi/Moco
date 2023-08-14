@@ -1,4 +1,6 @@
-﻿using Moco.SWF.Actions;
+﻿using Moco.Exceptions;
+using Moco.Rendering.Display;
+using Moco.SWF.Actions;
 using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
 
@@ -55,5 +57,70 @@ public class Frame
     public void AddAction(SwfAction action)
     {
         _actions.Add(action);
+    }
+
+    /// <summary>
+    /// Executes the tags that modify the display list.
+    /// </summary>
+    /// <param name="timeline">The timeline to perform it on.</param>
+    public void ExecuteTags(Timeline timeline)
+    {
+        foreach (var tag in EffectorTags)
+        {
+            // TODO(pref): Move this code somewhere that makes sense.
+            if (tag is PlaceObject placeObject)
+            {
+                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
+                    !placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
+                {
+                    timeline.DisplayList.Push(new Rendering.Display.Object
+                    {
+                        CharacterId = placeObject.CharacterId,
+                        Depth = placeObject.Depth,
+                        Matrix = placeObject.Matrix
+                    });
+                }
+
+                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
+                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
+                {
+                    timeline.DisplayList.RemoveAtDepth(placeObject.Depth);
+                    timeline.DisplayList.Push(new Rendering.Display.Object
+                    {
+                        CharacterId = placeObject.CharacterId,
+                        Depth = placeObject.Depth,
+                        Matrix = placeObject.Matrix
+                    });
+                }
+
+                if (!placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
+                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
+                {
+                    var maybeShape = timeline.DisplayList.GetAtDepth(placeObject.Depth);
+                    if (maybeShape is Rendering.Display.Object shape)
+                        shape.Matrix = placeObject.Matrix;
+                }
+            }
+            else if (tag is RemoveObject removeObject)
+            {
+                if (removeObject.CharacterId.HasValue)
+                    throw new MocoTodoException(TagType.RemoveObject, "Care about the character id when removing.");
+
+                timeline.DisplayList.RemoveAtDepth(removeObject.Depth);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Runs the actions for this frame.
+    /// </summary>
+    /// <param name="ctx">The execution context.</param>
+    public void RunActions(ActionExecutionContext ctx)
+    {
+        if (Actions.Count < 1)
+            return;
+
+        for (ctx.PC = 0; ctx.PC < Actions.Count; ctx.PC++)
+            Actions[ctx.PC].Execute(ctx);
     }
 }

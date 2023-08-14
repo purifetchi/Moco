@@ -35,7 +35,7 @@ public class DummyAction : SwfAction
     }
 
     /// <inheritdoc/>
-    public override void Execute()
+    public override void Execute(ActionExecutionContext _)
     {
         Console.WriteLine($"[Action::Execute] Dummy action executed for action type {_type}");
     }

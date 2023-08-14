@@ -144,50 +144,10 @@ public class Timeline
         }
 
         var frame = Frames[FrameIndex];
-        foreach (var tag in frame.EffectorTags)
-        {
-            // TODO(pref): Move this code somewhere that makes sense.
-            if (tag is PlaceObject placeObject)
-            {
-                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    !placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    DisplayList.Push(new Rendering.Display.Object
-                    {
-                        CharacterId = placeObject.CharacterId,
-                        Depth = placeObject.Depth,
-                        Matrix = placeObject.Matrix
-                    });
-                }
+        frame.ExecuteTags(this);
 
-                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    DisplayList.RemoveAtDepth(placeObject.Depth);
-                    DisplayList.Push(new Rendering.Display.Object
-                    {
-                        CharacterId = placeObject.CharacterId,
-                        Depth = placeObject.Depth,
-                        Matrix = placeObject.Matrix
-                    });
-                }
-
-                if (!placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    var maybeShape = DisplayList.GetAtDepth(placeObject.Depth);
-                    if (maybeShape is Rendering.Display.Object shape)
-                        shape.Matrix = placeObject.Matrix;
-                }
-            }
-            else if (tag is RemoveObject removeObject)
-            {
-                if (removeObject.CharacterId.HasValue)
-                    throw new MocoTodoException(TagType.RemoveObject, "Care about the character id when removing.");
-
-                DisplayList.RemoveAtDepth(removeObject.Depth);
-            }
-        }
+        // Actions are supposed to be run right after the frame is ready
+        frame.RunActions(new SWF.Actions.ActionExecutionContext(this));
 
         _sw.Restart();
     }
