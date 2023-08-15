@@ -475,6 +475,7 @@ public class SwfReader : IDisposable
             TagType.PlaceObject2 => new PlaceObject(version: 2),
             TagType.DefineShape => new DefineShape(version: 1),
             TagType.DefineShape2 => new DefineShape(version: 2),
+            TagType.DefineSprite => new DefineSprite(),
             TagType.ShowFrame => new ShowFrame(),
             TagType.DoAction => new DoAction(),
             TagType.End => new End(),
