@@ -177,6 +177,60 @@ public class SwfReader : IDisposable
     }
 
     /// <summary>
+    /// Reads a color transform with alpha.
+    /// </summary>
+    /// <returns>The color transform.</returns>
+    internal ColorTransform ReadCXFormWithAlphaRecord()
+    {
+        const int flagCount = 2;
+        const int nBitsLength = 4;
+
+        var br = new BitReader(_reader);
+        
+        var flags = (ColorTransformMode)br.ReadUnsignedBits(flagCount);
+        var nBits = br.ReadUnsignedBits(nBitsLength);
+
+        var rAdd = 0;
+        var gAdd = 0;
+        var bAdd = 0;
+        var aAdd = 0;
+        if (flags.HasFlag(ColorTransformMode.Addition))
+        {
+            rAdd = br.ReadSignedBits(nBits);
+            gAdd = br.ReadSignedBits(nBits);
+            bAdd = br.ReadSignedBits(nBits);
+            aAdd = br.ReadSignedBits(nBits);
+        }
+
+        var rMult = 0;
+        var gMult = 0;
+        var bMult = 0;
+        var aMult = 0;
+        if (flags.HasFlag(ColorTransformMode.Addition))
+        {
+            rMult = br.ReadSignedBits(nBits);
+            gMult = br.ReadSignedBits(nBits);
+            bMult = br.ReadSignedBits(nBits);
+            aMult = br.ReadSignedBits(nBits);
+        }
+
+        return new ColorTransform
+        {
+            Mode = flags,
+
+            RedAddTerm = rAdd,
+            GreenAddTerm = gAdd,
+            BlueAddTerm = bAdd,
+            AlphaAddTerm = aAdd,
+
+            RedMultTerm = rMult,
+            GreenMultTerm = gMult,
+            BlueMultTerm = bMult,
+            AlphaMultTerm = aMult
+        };
+    }
+
+    /// <summary>
     /// Reads the record header for a tag.
     /// </summary>
     /// <returns>The record header.</returns>
