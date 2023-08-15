@@ -23,6 +23,11 @@ public class Frame
     public IReadOnlyList<SwfAction> Actions => _actions;
 
     /// <summary>
+    /// Does this frame clear the display list when displayed?
+    /// </summary>
+    public bool ClearsDisplayList { get; set; } = false;
+
+    /// <summary>
     /// The frame tags.
     /// </summary>
     private readonly List<Tag> _frameTags;
@@ -66,6 +71,9 @@ public class Frame
     /// <param name="timeline">The timeline to perform it on.</param>
     public void ExecuteTags(Timeline timeline)
     {
+        if (ClearsDisplayList)
+            timeline.DisplayList.Clear();
+
         foreach (var tag in EffectorTags)
         {
             // TODO(pref): Move this code somewhere that makes sense.

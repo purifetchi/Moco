@@ -33,6 +33,8 @@ public class Timeline
             if (_sw.IsRunning == value)
                 return;
 
+            _paused = !value;
+
             if (value)
                 _sw.Start();
             else
@@ -71,6 +73,11 @@ public class Timeline
     private int _loops = 0;
 
     /// <summary>
+    /// Is the timeline paused?
+    /// </summary>
+    private bool _paused = false;
+
+    /// <summary>
     /// Constructs a new timeline and parses the tags into frames.
     /// </summary>
     /// <param name="tags">The tag list.</param>
@@ -97,7 +104,11 @@ public class Timeline
     /// <param name="tags">The tag enumerable.</param>
     private void ParseTagsIntoFrames(IEnumerable<Tag> tags)
     {
-        var frame = new Frame();
+        var frame = new Frame
+        {
+            ClearsDisplayList = true
+        };
+
         foreach (var tag in tags)
         {
             if (tag is IControlTag controlTag)
@@ -184,6 +195,9 @@ public class Timeline
     /// </summary>
     public void Tick()
     {
+        if (_paused)
+            return;
+
         if (!_sw.IsRunning && _loops < LoopCount)
             _sw.Start();
 

@@ -139,12 +139,13 @@ public class MocoEngine
     {
         using var reader = new SwfReader(filename);
         Swf = reader.ReadSwf();
+
+        RegisterCharacters();
+        PrepareWindow();
+
         _timeline = new(
             Swf.Tags,
             Swf.FrameRate,
             int.MaxValue);
-
-        RegisterCharacters();
-        PrepareWindow();
     }
 }
