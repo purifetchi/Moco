@@ -7,12 +7,12 @@
 public enum ColorTransformMode
 {
     /// <summary>
-    /// The terms are added to the previous color.
-    /// </summary>
-    Addition = 1 << 0,
-
-    /// <summary>
     /// The terms are multiplied with the previous color.
     /// </summary>
-    Multiplication = 1 << 1,
+    Multiplication = 1 << 0,
+
+    /// <summary>
+    /// The terms are added to the previous color.
+    /// </summary>
+    Addition = 1 << 1,
 }

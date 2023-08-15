@@ -206,7 +206,7 @@ public class SwfReader : IDisposable
         var gMult = 0;
         var bMult = 0;
         var aMult = 0;
-        if (flags.HasFlag(ColorTransformMode.Addition))
+        if (flags.HasFlag(ColorTransformMode.Multiplication))
         {
             rMult = br.ReadSignedBits(nBits);
             gMult = br.ReadSignedBits(nBits);

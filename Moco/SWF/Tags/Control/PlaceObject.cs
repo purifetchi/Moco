@@ -40,6 +40,11 @@ public class PlaceObject : Tag,
     public Matrix Matrix { get; private set; }
 
     /// <summary>
+    /// Color transform data.
+    /// </summary>
+    public ColorTransform ColorTransform { get; private set; }
+
+    /// <summary>
     /// The ratio.
     /// </summary>
     public ushort Ratio { get; private set; }
@@ -101,7 +106,7 @@ public class PlaceObject : Tag,
             Matrix = reader.ReadMatrixRecord();
 
         if (Flags.HasFlag(PlaceObjectFlags.HasCXForm))
-            throw new MocoTodoException("Read the cxform field of the place object tag.");
+            ColorTransform = reader.ReadCXFormWithAlphaRecord();
 
         if (Flags.HasFlag(PlaceObjectFlags.HasRatio))
             Ratio = binaryReader.ReadUInt16();
