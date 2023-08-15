@@ -1,5 +1,6 @@
 ﻿using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
+using Moco.SWF.Tags.Control;
 
 namespace Moco.SWF.Tags.Definition;
 
@@ -36,14 +37,16 @@ public class DefineSprite : Tag,
         CharacterId = br.ReadUInt16();
 
         Tags = new();
-        for (var i = 0; i < FrameCount; i++)
+
+        Tag? tag;
+        do
         {
-            var tag = reader.ReadTag();
+            tag = reader.ReadTag();
             if (tag is null)
                 continue;
 
             Tags.Add(tag);
-        }
+        } while (tag is not End);
 
         return this;
     }
