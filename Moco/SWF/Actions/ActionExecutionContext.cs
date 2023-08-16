@@ -23,6 +23,11 @@ public class ActionExecutionContext
     public int PC { get; set; }
 
     /// <summary>
+    /// Should the action execution context halt after this?
+    /// </summary>
+    public bool Halt { get; set; }
+
+    /// <summary>
     /// Constructs a new action execution context.
     /// </summary>
     /// <param name="sourceTimeline">The spawning timeline.</param>
@@ -32,5 +37,6 @@ public class ActionExecutionContext
         TargetTimeline = SourceTimeline;
 
         PC = 0;
+        Halt = false;
     }
 }

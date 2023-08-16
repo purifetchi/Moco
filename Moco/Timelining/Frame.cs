@@ -133,6 +133,12 @@ public class Frame
         {
             Console.WriteLine($"[Frame::RunActions] Executing action {Actions[ctx.PC].Type} at PC {ctx.PC}");
             Actions[ctx.PC].Execute(ctx);
+
+            if (ctx.Halt)
+            {
+                Console.WriteLine($"[Frame::RunActions] Action execution halted by action {Actions[ctx.PC].Type}");
+                break;
+            }
         }
     }
 }

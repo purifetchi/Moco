@@ -14,6 +14,7 @@ public class PlayAction : SwfAction
     public override void Execute(ActionExecutionContext ctx)
     {
         ctx.TargetTimeline.Active = true;
+        ctx.Halt = ctx.SourceTimeline == ctx.TargetTimeline;
     }
 
     /// <inheritdoc/>
