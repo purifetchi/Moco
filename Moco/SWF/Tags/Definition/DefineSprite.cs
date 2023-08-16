@@ -33,8 +33,8 @@ public class DefineSprite : Tag,
     internal override Tag Parse(SwfReader reader, RecordHeader header)
     {
         var br = reader.GetBinaryReader();
-        FrameCount = br.ReadUInt16();
         CharacterId = br.ReadUInt16();
+        FrameCount = br.ReadUInt16();
 
         Tags = new();
 

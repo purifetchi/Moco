@@ -1,4 +1,6 @@
-﻿namespace Moco.SWF.Characters;
+﻿using Moco.Rendering.Display;
+
+namespace Moco.SWF.Characters;
 
 /// <summary>
 /// A character that can be referenced by the swf.

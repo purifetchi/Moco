@@ -1,4 +1,5 @@
 ﻿using Moco.SWF.Characters;
+using Moco.SWF.Characters.Sprites;
 using Moco.SWF.DataTypes;
 
 namespace Moco.Rendering.Display;
@@ -31,12 +32,19 @@ public class Object : IDisplayListMember
     {
         var maybeObject = ctx.Engine.GetCharacter(CharacterId);
 
-        if (maybeObject is not IShape shape)
+        if (maybeObject is IShape shape)
+        {
+            ctx.Engine.Backend.PlaceShape(shape, Matrix);
+        }
+        else if (maybeObject is Sprite sprite)
+        {
+            sprite.Tick();
+            sprite.Draw(ctx);
+        }
+        else
         {
             Console.WriteLine($"[Object::Draw] Missing shape at id {CharacterId} (is it an object we can't read yet?)");
             return;
         }
-
-        ctx.Engine.Backend.PlaceShape(shape, Matrix);
     }
 }

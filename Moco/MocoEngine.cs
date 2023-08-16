@@ -1,6 +1,7 @@
 ﻿using Moco.Rasterization;
 using Moco.Rendering;
 using Moco.SWF;
+using Moco.SWF.Characters.Sprites;
 using Moco.SWF.Serialization;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
@@ -98,6 +99,12 @@ public class MocoEngine
                         defineBitsLossless.Pixmap!);
 
                     _objectDictionary.Add(defineBitsLossless.CharacterId, imageObj);
+                    break;
+
+                case DefineSprite defineSprite:
+                    _objectDictionary.Add(
+                        defineSprite.CharacterId, 
+                        new Sprite(defineSprite, Swf.FrameRate));
                     break;
 
                 default:
