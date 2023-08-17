@@ -52,14 +52,23 @@ public class DefineShape : Tag,
         CharacterId = reader.GetBinaryReader().ReadUInt16();
         ShapeBounds = reader.ReadRectangleRecord();
 
-        var fillStyles = reader.ReadStyleArray(reader.ReadFillStyle);
-        var lineStyles = reader.ReadStyleArray(reader.ReadLineStyle);
+        var styleReadingCtx = new StyleReadingContext(
+            Version >= 3,
+            Version == 4);
+
+        var fillStyles = reader.ReadStyleArray(styleReadingCtx, reader.ReadFillStyle);
+        var lineStyles = reader.ReadStyleArray(styleReadingCtx, reader.ReadLineStyle);
 
         var br = new BitReader(reader.GetBinaryReader());
         var numFillBits = br.ReadUnsignedBits(4);
         var numLineBits = br.ReadUnsignedBits(4);
 
-        var records = reader.ReadShapeRecordsList(new ShapeRecordReadingContext(numFillBits, numLineBits));
+        var records = reader.ReadShapeRecordsList(
+            new ShapeRecordReadingContext(
+                numFillBits, 
+                numLineBits,
+                styleReadingCtx)
+            );
 
         ShapeWithStyle = new ShapeWithStyle(
             fillStyles,

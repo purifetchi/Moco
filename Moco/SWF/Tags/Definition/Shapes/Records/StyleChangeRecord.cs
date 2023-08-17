@@ -112,15 +112,18 @@ public class StyleChangeRecord : IShapeRecord
 
         if (Flags.HasFlag(StyleChangeRecordFlags.HasNewStyles))
         {
-            FillStyles = swfReader.ReadStyleArray(swfReader.ReadFillStyle);
-            LineStyles = swfReader.ReadStyleArray(swfReader.ReadLineStyle);
+            FillStyles = swfReader.ReadStyleArray(ctx.StyleReadingContext, swfReader.ReadFillStyle);
+            LineStyles = swfReader.ReadStyleArray(ctx.StyleReadingContext, swfReader.ReadLineStyle);
 
             // hackity hack
             br = new BitReader(swfReader.GetBinaryReader());
             NumFillBits = br.ReadUnsignedBits(4);
             NumLineBits = br.ReadUnsignedBits(4);
 
-            ctx = new ShapeRecordReadingContext(NumFillBits, NumLineBits);
+            ctx = new ShapeRecordReadingContext(
+                NumFillBits, 
+                NumLineBits,
+                ctx.StyleReadingContext);
         }
 
         return this;

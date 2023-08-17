@@ -308,16 +308,16 @@ public class SwfReader : IDisposable
     /// <summary>
     /// Reads a single fill style.
     /// </summary>
+    /// <param name="ctx">The style reading context.</param>
     /// <returns>The fill style.</returns>
-    internal FillStyle ReadFillStyle()
+    internal FillStyle ReadFillStyle(StyleReadingContext ctx)
     {
         var type = (FillStyleType)_reader.ReadByte();
 
         switch (type)
         {
             case FillStyleType.Solid:
-                // TODO(pref): RGBA if Shape3
-                var color = ReadRGBRecord();
+                var color = ctx.ReadRGBA ? ReadRGBARecord() : ReadRGBRecord();
                 return new FillStyle(type, color);
 
             case FillStyleType.RepeatingBitmap:
@@ -337,15 +337,15 @@ public class SwfReader : IDisposable
     /// <summary>
     /// Reads a single line style.
     /// </summary>
+    /// <param name="ctx">The style reading context.</param>
     /// <returns>The line style.</returns>
-    internal LineStyle ReadLineStyle()
+    internal LineStyle ReadLineStyle(StyleReadingContext ctx)
     {
-        // TODO(pref): Read an RGBA record for Shape3.
         // TODO(pref): Support LineStyle2 (DefineShape4).
         return new LineStyle
         {
             Width = _reader.ReadUInt16(),
-            Color = ReadRGBRecord()
+            Color = ctx.ReadRGBA ? ReadRGBARecord() : ReadRGBRecord()
         };
     }
 
@@ -415,9 +415,12 @@ public class SwfReader : IDisposable
     /// Wrapper for reading (Fill/Line)Style arrays.
     /// </summary>
     /// <typeparam name="TStyle">The type we're reading.</typeparam>
+    /// <param name="ctx">The style reading context.</param>
     /// <param name="reader">The method for reading.</param>
     /// <returns>The style array.</returns>
-    internal TStyle[] ReadStyleArray<TStyle>(Func<TStyle> reader)
+    internal TStyle[] ReadStyleArray<TStyle>(
+        StyleReadingContext ctx, 
+        Func<StyleReadingContext, TStyle> reader)
     {
         var styleCount = _reader.ReadByte();
 
@@ -427,7 +430,7 @@ public class SwfReader : IDisposable
 
         var styles = new TStyle[styleCount];
         for (var i = 0; i < styleCount; i++)
-            styles[i] = reader();
+            styles[i] = reader(ctx);
 
         return styles;
     }
@@ -475,6 +478,7 @@ public class SwfReader : IDisposable
             TagType.PlaceObject2 => new PlaceObject(version: 2),
             TagType.DefineShape => new DefineShape(version: 1),
             TagType.DefineShape2 => new DefineShape(version: 2),
+            TagType.DefineShape3 => new DefineShape(version: 3),
             TagType.DefineSprite => new DefineSprite(),
             TagType.ShowFrame => new ShowFrame(),
             TagType.DoAction => new DoAction(),
