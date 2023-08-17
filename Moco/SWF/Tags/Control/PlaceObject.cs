@@ -37,7 +37,7 @@ public class PlaceObject : Tag,
     /// <summary>
     /// Transform matrix data.
     /// </summary>
-    public Matrix Matrix { get; private set; }
+    public Matrix Matrix { get; private set; } = Matrix.Identity;
 
     /// <summary>
     /// Color transform data.

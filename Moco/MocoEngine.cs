@@ -2,6 +2,7 @@
 using Moco.Rendering;
 using Moco.SWF;
 using Moco.SWF.Characters.Sprites;
+using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
 using Moco.SWF.Tags.Control;
 using Moco.SWF.Tags.Definition;
@@ -122,7 +123,7 @@ public class MocoEngine
     private void Tick()
     {
         _timeline?.Tick();
-        _timeline?.Draw(new DisplayListDrawingContext(this));
+        _timeline?.Draw(new DisplayListDrawingContext(this, Matrix.Identity));
     }
 
     /// <summary>

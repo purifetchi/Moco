@@ -34,12 +34,12 @@ public class Object : IDisplayListMember
 
         if (maybeObject is IShape shape)
         {
-            ctx.Engine.Backend.PlaceShape(shape, Matrix);
+            ctx.Engine.Backend.PlaceShape(shape, ctx.BaseMatrix.Combine(Matrix));
         }
         else if (maybeObject is Sprite sprite)
         {
             sprite.Tick();
-            sprite.Draw(ctx);
+            sprite.Draw(new DisplayListDrawingContext(ctx.Engine, ctx.BaseMatrix.Combine(Matrix)));
         }
         else
         {

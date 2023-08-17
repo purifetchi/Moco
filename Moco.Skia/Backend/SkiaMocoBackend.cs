@@ -101,7 +101,7 @@ public class SkiaMocoBackend : IMocoRendererBackend
     public void SetWindowSize(SWF.DataTypes.Rectangle rect)
     {
         _window.Size = new Vector2D<int>(
-            (int)rect.XMax.LogicalPixelValue, 
+            (int)rect.XMax.LogicalPixelValue,
             (int)rect.YMax.LogicalPixelValue);
 
         _canvas.Dispose();
@@ -109,8 +109,8 @@ public class SkiaMocoBackend : IMocoRendererBackend
         _rt.Dispose();
 
         _rt = new GRBackendRenderTarget(
-            (int)rect.XMax.LogicalPixelValue, 
-            (int)rect.YMax.LogicalPixelValue, 
+            (int)rect.XMax.LogicalPixelValue,
+            (int)rect.YMax.LogicalPixelValue,
             0, 8, new GRGlFramebufferInfo(1, 0x8058));
 
         _surface = SKSurface.Create(_context, _rt, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888);
@@ -126,10 +126,10 @@ public class SkiaMocoBackend : IMocoRendererBackend
         var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
         var info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
         bitmap.InstallPixels(
-            info, 
-            handle.AddrOfPinnedObject(), 
-            info.RowBytes, 
-            delegate { handle.Free(); }, 
+            info,
+            handle.AddrOfPinnedObject(),
+            info.RowBytes,
+            delegate { handle.Free(); },
             null);
 
         return bitmap;
@@ -148,14 +148,52 @@ public class SkiaMocoBackend : IMocoRendererBackend
     /// <inheritdoc/>
     public void PlaceShape(IShape shape, Matrix matrix)
     {
+        // TODO(pref): We shouldn't actually store it all in bitmaps. The point of 
+        //             Flash is that it's a vector format... Scaling with all of 
+        //             the shapes pre-rasterized looks horrid.
+        //             I've tried this before but ran into weird issues with fill
+        //             bitmaps not being scaled properly to the path.
+
         var skiaShape = shape as SkiaMocoShape;
+
         if (matrix.HasScale || matrix.HasRotation)
-            throw new NotSupportedException("Support scaling or rotating drawn shapes.");
+        {
+            // If we have scale or rotation, we need to instantiate a new auto restore context
+            using var _ = new SKAutoCanvasRestore(_canvas);
+            using var paint = new SKPaint
+            {
+                IsAntialias = true,
+                FilterQuality = SKFilterQuality.High
+            };
+
+            // TODO(pref): This is still very much wrong but I guess it's fine enough
+            //             for an initial implementation.
+            //             This will absolutely get better when I'll properly start
+            //             drawing vectors directly instead of pre-rasterizing.
+
+            _canvas.Translate(
+                matrix.TranslateX.LogicalPixelValue,
+                matrix.TranslateY.LogicalPixelValue);
+
+            _canvas.Scale(
+                matrix.ScaleX,
+                matrix.ScaleY);
+
+            _canvas.Skew(
+                matrix.RotateSkew1,
+                matrix.RotateSkew0);
+
+            _canvas.DrawBitmap(
+                skiaShape!.Surface,
+                new SKPoint(skiaShape.Bounds.XMin.LogicalPixelValue, skiaShape.Bounds.YMin.LogicalPixelValue),
+                paint);
+            return;
+        }
 
         _canvas.DrawBitmap(
             skiaShape!.Surface,
             new SKPoint(
-                matrix.TranslateX.LogicalPixelValue + skiaShape.Bounds.XMin.LogicalPixelValue, 
+                matrix.TranslateX.LogicalPixelValue + skiaShape.Bounds.XMin.LogicalPixelValue,
                 matrix.TranslateY.LogicalPixelValue + skiaShape.Bounds.YMin.LogicalPixelValue));
     }
 }

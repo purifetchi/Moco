@@ -1,4 +1,5 @@
 ﻿using Moco.Rendering;
+using Moco.SWF.DataTypes;
 using Moco.SWF.Tags.Definition;
 using Moco.Timelining;
 
