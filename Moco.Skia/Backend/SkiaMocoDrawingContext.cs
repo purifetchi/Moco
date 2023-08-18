@@ -156,6 +156,9 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     /// <inheritdoc/>
     public void SetStroke(LineStyle style)
     {
+        if (style is LineStyle2)
+            Console.WriteLine($"[SkiaMocoDrawingContext::SetStroke] This is a LineStyle2 stroke, we will not draw it properly yet.");
+
         _paint?.Dispose();
 
         if (style is null)
@@ -174,7 +177,8 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
             IsAntialias = true,
             Color = new SKColor(style.Color.Red, style.Color.Green, style.Color.Blue, style.Color.Alpha),
             StrokeWidth = new Twip(style.Width).LogicalPixelValue,
-            StrokeJoin = SKStrokeJoin.Round
+            StrokeJoin = SKStrokeJoin.Round,
+            StrokeCap = SKStrokeCap.Round
         };
     }
 

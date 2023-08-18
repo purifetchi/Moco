@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.ComponentModel.DataAnnotations;
+using System.IO.Compression;
 using System.Text;
 using Moco.Exceptions;
 using Moco.SWF.Actions;
@@ -341,7 +342,38 @@ public class SwfReader : IDisposable
     /// <returns>The line style.</returns>
     internal LineStyle ReadLineStyle(StyleReadingContext ctx)
     {
-        // TODO(pref): Support LineStyle2 (DefineShape4).
+        if (ctx.ReadLineStyle2)
+        {
+            const int enumBitLength = 2;
+            const int flagBitLength = 10;
+
+            var width = _reader.ReadUInt16();
+            var br = new BitReader(_reader);
+            
+            var startCap = br.ReadEnum<CapStyle>(enumBitLength);
+            var joinStyle = br.ReadEnum<JoinStyle>(enumBitLength);
+
+            var flags = br.ReadEnum<LineStyle2Flags>(flagBitLength);
+
+            var endCap = br.ReadEnum<CapStyle>(enumBitLength);
+
+            var miterLimitFactor = joinStyle == JoinStyle.Miter ? Read88FixedPoint() : 0f;
+            var color = !flags.HasFlag(LineStyle2Flags.HasFill) ? ReadRGBARecord() : new Rgba();
+            var fillType = flags.HasFlag(LineStyle2Flags.HasFill) ? ReadFillStyle(ctx) : null;
+
+            return new LineStyle2
+            {
+                Width = width,
+                StartCapStyle = startCap,
+                JoinStyle = joinStyle,
+                EndCapStyle = endCap,
+                Flags = flags,
+                MiterLimitFactor = miterLimitFactor,
+                Color = color,
+                FillType = fillType,
+            };
+        }
+
         return new LineStyle
         {
             Width = _reader.ReadUInt16(),
@@ -479,6 +511,7 @@ public class SwfReader : IDisposable
             TagType.DefineShape => new DefineShape(version: 1),
             TagType.DefineShape2 => new DefineShape(version: 2),
             TagType.DefineShape3 => new DefineShape(version: 3),
+            TagType.DefineShape4 => new DefineShape(version: 4),
             TagType.DefineSprite => new DefineSprite(),
             TagType.ShowFrame => new ShowFrame(),
             TagType.DoAction => new DoAction(),

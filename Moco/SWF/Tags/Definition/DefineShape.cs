@@ -33,6 +33,16 @@ public class DefineShape : Tag,
     public Rectangle ShapeBounds { get; private set; }
 
     /// <summary>
+    /// Bounds of the shape, excluding strokes.
+    /// </summary>
+    public Rectangle EdgeBounds { get; private set; }
+
+    /// <summary>
+    /// The flags for DefineShape4.
+    /// </summary>
+    public DefineShape4Flags DefineShape4Flags { get; private set; } = DefineShape4Flags.None;
+
+    /// <summary>
     /// The shape with style.
     /// </summary>
     public ShapeWithStyle? ShapeWithStyle { get; private set; }
@@ -51,6 +61,16 @@ public class DefineShape : Tag,
     {
         CharacterId = reader.GetBinaryReader().ReadUInt16();
         ShapeBounds = reader.ReadRectangleRecord();
+
+        // NOTE(pref): DefineShape4 specific.
+        if (Version == 4)
+        {
+            const int defineShape4FlagsLength = 8;
+
+            EdgeBounds = reader.ReadRectangleRecord();
+            DefineShape4Flags = new BitReader(reader.GetBinaryReader())
+                .ReadEnum<DefineShape4Flags>(defineShape4FlagsLength);
+        }
 
         var styleReadingCtx = new StyleReadingContext(
             Version >= 3,

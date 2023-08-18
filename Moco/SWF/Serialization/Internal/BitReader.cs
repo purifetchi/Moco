@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace Moco.SWF.Serialization.Internal;
 
@@ -69,6 +70,19 @@ internal ref struct BitReader
     public bool ReadBitFlag()
     {
         return ReadBit() != 0;
+    }
+
+    /// <summary>
+    /// Reads an enum from the bit reader.
+    /// </summary>
+    /// <typeparam name="TEnum">The enum.</typeparam>
+    /// <param name="bits">The length.</param>
+    /// <returns>The enum.</returns>
+    public TEnum ReadEnum<TEnum>(uint bits)
+        where TEnum : struct, Enum
+    {
+        var value = ReadUnsignedBits(bits);
+        return Unsafe.As<uint, TEnum>(ref value);
     }
 
     /// <summary>
