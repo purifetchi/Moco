@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.IO.Compression;
+using System.Net.Http.Headers;
 using System.Text;
 using Moco.Exceptions;
 using Moco.SWF.Actions;
@@ -307,6 +308,42 @@ public class SwfReader : IDisposable
     }
 
     /// <summary>
+    /// Reads a gradientrecord record.
+    /// </summary>
+    /// <param name="ctx">The style reading context.</param>
+    /// <returns>The gradientrecord record.</returns>
+    internal GradientRecord ReadGradientRecordRecord(StyleReadingContext ctx)
+    {
+        return new GradientRecord
+        {
+            Ratio = _reader.ReadByte(),
+            Color = ctx.ReadRGBA ? ReadRGBARecord() : ReadRGBRecord()
+        };
+    }
+    
+    /// <summary>
+    /// Reads a gradient record.
+    /// </summary>
+    /// <param name="ctx">The style reading context.</param>
+    /// <returns>The gradient record.</returns>
+    internal Gradient ReadGradientRecord(StyleReadingContext ctx)
+    {
+        const int enumBits = 2;
+        const int numGradientsLength = 4;
+
+        var br = new BitReader(_reader);
+        var spread = br.ReadEnum<SpreadMode>(enumBits);
+        var interpolation = br.ReadEnum<InterpolationMode>(enumBits);
+        var nGrads = br.ReadUnsignedBits(numGradientsLength);
+
+        var records = new GradientRecord[nGrads];
+        for (var i = 0; i < nGrads; i++)
+            records[i] = ReadGradientRecordRecord(ctx);
+
+        return new Gradient(spread, interpolation, records);
+    }
+
+    /// <summary>
     /// Reads a single fill style.
     /// </summary>
     /// <param name="ctx">The style reading context.</param>
@@ -329,6 +366,12 @@ public class SwfReader : IDisposable
                 var bitmapMatrix = ReadMatrixRecord();
 
                 return new FillStyle(type, bitmapId, bitmapMatrix);
+
+            case FillStyleType.LinearGradient:
+            case FillStyleType.RadialGradient:
+                var gradientMatrix = ReadMatrixRecord();
+                var gradient = ReadGradientRecord(ctx);
+                return new FillStyle(type, gradientMatrix, gradient);
 
             default:
                 throw new MocoTodoException($"Fill type {type} is not yet supported.");

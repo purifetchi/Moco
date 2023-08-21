@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Moco.Exceptions;
 using Moco.Rendering;
 using Moco.Rendering.Display;
 using Moco.SWF.Tags;
@@ -131,6 +130,11 @@ public class Timeline
                 frame = new();
             }
         }
+
+        // NOTE(pref): No clue if this is correct or not. Overdrive has some sprites that have no
+        //             ShowFrame tags, only PlaceObject and End. Seems to make it work just fine
+        //             though.
+        _frames.Add(frame);
 
         AdvanceFrame();
     }

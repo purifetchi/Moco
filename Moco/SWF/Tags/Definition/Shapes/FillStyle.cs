@@ -17,7 +17,15 @@ public class FillStyle
     /// </summary>
     public Rgba Color { get; private set; }
 
-    // TODO(pref): skipped GradientMatrix, Gradient
+    /// <summary>
+    /// The gradient matrix.
+    /// </summary>
+    public Matrix GradientMatrix { get; private set; }
+
+    /// <summary>
+    /// The gradient.
+    /// </summary>
+    public Gradient? Gradient { get; private set; }
 
     /// <summary>
     /// ID of bitmap character for fill.
@@ -56,5 +64,21 @@ public class FillStyle
     {
         Type = type;
         Color = color;
+    }
+
+    /// <summary>
+    /// Constructs a new fill style for the gradient fill.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    /// <param name="gradientMatrix">The gradient matrix.</param>
+    /// <param name="gradient">The gradient.</param>
+    public FillStyle(
+        FillStyleType type,
+        Matrix gradientMatrix,
+        Gradient gradient)
+    {
+        Type = type;
+        GradientMatrix = gradientMatrix;
+        Gradient = gradient;
     }
 }
