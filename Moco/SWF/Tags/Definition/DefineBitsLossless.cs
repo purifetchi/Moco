@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.IO.Compression;
-using Moco.Exceptions;
+﻿using System.IO.Compression;
 using Moco.SWF.DataTypes;
 using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
@@ -102,6 +99,7 @@ public class DefineBitsLossless : Tag,
         var pixels = BitmapFormat switch
         {
             3 => ReadIndexedColorMap(reader),
+            5 => Read24BppArgb(reader),
             _ => null!
         };
 
@@ -169,6 +167,32 @@ public class DefineBitsLossless : Tag,
 
             for (var x = 0; x < padding; x++)
                 byteArrayIndex++;
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// Reads a 24-bit/32-bit Argb pixmap data.
+    /// </summary>
+    /// <param name="reader">The reader.</param>
+    /// <returns>The pixmap.</returns>
+    private byte[] Read24BppArgb(BinaryReader reader)
+    {
+        // Read the actual color map data.
+        const int colorComponents = 4;
+        var data = new byte[BitmapWidth * BitmapHeight * colorComponents];
+
+        // Reading all of the bytes at once gave us an improvement of ~500%.
+        var bytes = reader.ReadBytes(BitmapHeight * BitmapWidth * 4);
+
+        for (var pixelIndex = 0; pixelIndex < bytes.Length; pixelIndex += colorComponents)
+        {
+            // ARGB -> RGBA
+            data[pixelIndex] = bytes[pixelIndex + 1];
+            data[pixelIndex + 1] = bytes[pixelIndex + 2];
+            data[pixelIndex + 2] = bytes[pixelIndex + 3];
+            data[pixelIndex + 3] = bytes[pixelIndex];
         }
 
         return data;
