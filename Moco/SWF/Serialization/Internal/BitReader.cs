@@ -133,13 +133,10 @@ internal ref struct BitReader
         const float fractionalDivisor = 1f / (ushort.MaxValue + 1f);
 
         var value = ReadSignedBits(bits);
-        Console.WriteLine($"[ReadFloatingBits] Value => {value}");
 
         // Split the value into two.
         var fractionalPart = value & (fractionalPartMask);
         var integerPart = (value & ~fractionalPartMask) >> 16;
-
-        Console.WriteLine($"[ReadFloatingBits] This should yield {integerPart}.{fractionalPart * fractionalDivisor}");
 
         return integerPart + (fractionalPart * fractionalDivisor);
     }

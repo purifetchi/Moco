@@ -541,7 +541,7 @@ public class SwfReader : IDisposable
     internal Tag ReadTag()
     {
         var record = ReadRecordHeader();
-        Console.WriteLine($"Read tag {record.Type} of length {record.Length}");
+        //Console.WriteLine($"Read tag {record.Type} of length {record.Length}");
 
         Tag tag = record.Type switch
         {
