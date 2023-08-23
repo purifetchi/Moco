@@ -78,18 +78,22 @@ public class SwfReader : IDisposable
     {
         var swf = new Swf(ReadHeader());
 
-        while (swf.GetTag<End>() is null)
+        Tag tag;
+        do
         {
             try
             {
-                swf.AddTag(ReadTag());
+                tag = ReadTag();
+                swf.AddTag(tag);
             }
             catch (MocoTodoException e)
             {
                 Console.WriteLine(e.Message);
                 Environment.Exit(1);
+                return swf;
             }
-        }
+
+        } while (tag is not End);
 
         return swf;
     }
