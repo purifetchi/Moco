@@ -26,14 +26,14 @@ public class MocoEngine
     public Swf? Swf { get; private set; }
 
     /// <summary>
+    /// The main timeline.
+    /// </summary>
+    public Timeline? Timeline { get; private set; }
+
+    /// <summary>
     /// The object dictionary.
     /// </summary>
     private Dictionary<ushort, object> _objectDictionary;
-
-    /// <summary>
-    /// The main timeline.
-    /// </summary>
-    private Timeline? _timeline;
 
     /// <summary>
     /// Constructs a new moco instance for the given backend.
@@ -70,6 +70,8 @@ public class MocoEngine
         if (Swf is null)
             return;
 
+        _objectDictionary.Clear();
+
         foreach (var tag in Swf.Tags)
         {
             if (tag is not ICharacterDefinitionTag characterDefinitionTag)
@@ -104,7 +106,7 @@ public class MocoEngine
 
                 case DefineSprite defineSprite:
                     _objectDictionary.Add(
-                        defineSprite.CharacterId, 
+                        defineSprite.CharacterId,
                         new Sprite(defineSprite, Swf.FrameRate));
                     break;
 
@@ -122,8 +124,8 @@ public class MocoEngine
     /// </summary>
     private void Tick()
     {
-        _timeline?.Tick();
-        _timeline?.Draw(new DisplayListDrawingContext(this, Matrix.Identity));
+        Timeline?.Tick();
+        Timeline?.Draw(new DisplayListDrawingContext(this, Matrix.Identity));
     }
 
     /// <summary>
@@ -151,7 +153,7 @@ public class MocoEngine
         RegisterCharacters();
         PrepareWindow();
 
-        _timeline = new(
+        Timeline = new(
             Swf.Tags,
             Swf.FrameRate,
             int.MaxValue);
