@@ -185,8 +185,6 @@ public class SkiaMocoDrawingContext : IMocoDrawingContext
     /// <inheritdoc/>
     public void FlushPoints()
     {
-        _path.Close();
-
         _canvas.DrawPath(_path, _paint);
         _path.Reset();
     }
