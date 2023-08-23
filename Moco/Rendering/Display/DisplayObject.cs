@@ -7,7 +7,7 @@ namespace Moco.Rendering.Display;
 /// <summary>
 /// A display list object placed by PlaceObject.
 /// </summary>
-public class Object : IDisplayListMember
+public class DisplayObject : IDisplayListMember
 {
     /// <summary>
     /// The character id.
@@ -24,10 +24,7 @@ public class Object : IDisplayListMember
     /// </summary>
     public Matrix Matrix { get; set; }
 
-    /// <summary>
-    /// Draws this object.
-    /// </summary>
-    /// <param name="ctx">The context.</param>
+    /// <inheritdoc/>
     public void Draw(DisplayListDrawingContext ctx)
     {
         var maybeObject = ctx.Engine.GetCharacter(CharacterId);
@@ -46,5 +43,11 @@ public class Object : IDisplayListMember
             Console.WriteLine($"[Object::Draw] Missing shape at id {CharacterId} (is it an object we can't read yet?)");
             return;
         }
+    }
+
+    /// <inheritdoc/>
+    public void Replace(ushort characterId)
+    {
+        CharacterId = characterId;
     }
 }

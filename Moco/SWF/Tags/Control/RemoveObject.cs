@@ -1,5 +1,8 @@
-﻿using Moco.SWF.Serialization;
+﻿using Moco.Exceptions;
+using Moco.Rendering.Display;
+using Moco.SWF.Serialization;
 using Moco.SWF.Serialization.Internal;
+using Moco.Timelining;
 
 namespace Moco.SWF.Tags.Control;
 
@@ -8,7 +11,7 @@ namespace Moco.SWF.Tags.Control;
 /// </summary>
 public class RemoveObject : Tag,
     IVersionedTag,
-    IControlTag
+	IDisplayListAffectingTag
 {
     /// <inheritdoc/>
     public override TagType Type => _actualTag;
@@ -61,6 +64,24 @@ public class RemoveObject : Tag,
                 throw new NotSupportedException("There are no other tags than RemoveObject and RemoveObject2.");
         }
     }
+
+    /// <inheritdoc/>
+    public void Execute(DisplayList displayList)
+    {
+        // RemoveObject1 specific.
+        if (CharacterId.HasValue)
+        {
+            var objectAtDepth = displayList.GetAtDepth(Depth);
+            if (objectAtDepth is DisplayObject displayObject &&
+                displayObject.CharacterId != CharacterId.Value)
+            {
+                Console.WriteLine("Mismatch when doing RemoveObject.");
+                return;
+            }
+        }
+
+		displayList.RemoveAtDepth(Depth);
+	}
 
     /// <inheritdoc/>
     internal override Tag Parse(SwfReader reader, RecordHeader header)

@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-using Moco.Exceptions;
-using Moco.Rendering.Display;
+﻿using Moco.Exceptions;
 using Moco.SWF.Actions;
 using Moco.SWF.Tags;
 using Moco.SWF.Tags.Control;
@@ -15,7 +13,7 @@ public class Frame
     /// <summary>
     /// The list of effector tags.
     /// </summary>
-    public IReadOnlyList<Tag> EffectorTags => _frameTags;
+    public IReadOnlyList<IControlTag> EffectorTags => _frameTags;
 
     /// <summary>
     /// The list of actions to perform.
@@ -30,7 +28,7 @@ public class Frame
     /// <summary>
     /// The frame tags.
     /// </summary>
-    private readonly List<Tag> _frameTags;
+    private readonly List<IControlTag> _frameTags;
 
     /// <summary>
     /// The actions.
@@ -53,7 +51,7 @@ public class Frame
     public void AddTag<TTag>(TTag tag)
         where TTag : IControlTag
     {
-        _frameTags.Add((tag as Tag)!);
+        _frameTags.Add(tag);
     }
 
     /// <summary>
@@ -76,47 +74,8 @@ public class Frame
 
         foreach (var tag in EffectorTags)
         {
-            // TODO(pref): Move this code somewhere that makes sense.
-            if (tag is PlaceObject placeObject)
-            {
-                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    !placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    timeline.DisplayList.Push(new Rendering.Display.Object
-                    {
-                        CharacterId = placeObject.CharacterId,
-                        Depth = placeObject.Depth,
-                        Matrix = placeObject.Matrix
-                    });
-                }
-
-                if (placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    timeline.DisplayList.RemoveAtDepth(placeObject.Depth);
-                    timeline.DisplayList.Push(new Rendering.Display.Object
-                    {
-                        CharacterId = placeObject.CharacterId,
-                        Depth = placeObject.Depth,
-                        Matrix = placeObject.Matrix
-                    });
-                }
-
-                if (!placeObject.Flags.HasFlag(PlaceObjectFlags.HasCharacter) &&
-                    placeObject.Flags.HasFlag(PlaceObjectFlags.Move))
-                {
-                    var maybeShape = timeline.DisplayList.GetAtDepth(placeObject.Depth);
-                    if (maybeShape is Rendering.Display.Object shape)
-                        shape.Matrix = placeObject.Matrix;
-                }
-            }
-            else if (tag is RemoveObject removeObject)
-            {
-                if (removeObject.CharacterId.HasValue)
-                    throw new MocoTodoException(TagType.RemoveObject, "Care about the character id when removing.");
-
-                timeline.DisplayList.RemoveAtDepth(removeObject.Depth);
-            }
+            if (tag is IDisplayListAffectingTag effector)
+                effector.Execute(timeline.DisplayList);
         }
     }
 

@@ -15,4 +15,10 @@ public interface IDisplayListMember
     /// </summary>
     /// <param name="ctx">The drawing context.</param>
     void Draw(DisplayListDrawingContext ctx);
+
+    /// <summary>
+    /// Replace the object at this depth with a different character.
+    /// </summary>
+    /// <param name="characterId">The character id.</param>
+    void Replace(ushort characterId);
 }

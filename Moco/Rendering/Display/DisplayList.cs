@@ -54,6 +54,17 @@ public class DisplayList
     }
 
     /// <summary>
+    /// Replaces a member at a depth with a new character.
+    /// </summary>
+    /// <param name="depth">The depth.</param>
+    /// <param name="newCharacter">The new character.</param>
+    public void ReplaceAtDepth(int depth, ushort newCharacter)
+    {
+        _entries.FirstOrDefault(i => i.Depth == depth)?
+            .Replace(newCharacter);
+    }
+
+    /// <summary>
     /// Gets the specified member at a depth.
     /// </summary>
     /// <param name="depth">The depth.</param>
